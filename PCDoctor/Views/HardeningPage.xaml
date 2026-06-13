@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="PCDoctor.Views.HardeningPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:PCDoctor.ViewModels">
+
+    <Page.DataContext>
+        <vm:HardeningViewModel/>
+    </Page.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Margin="40" Spacing="20" MaxWidth="800" HorizontalAlignment="Left">
+            <TextBlock Text="Durcissement (Hardening)" FontSize="32" FontWeight="SemiBold"/>
+            <TextBlock Text="Les interrupteurs reflètent l'état réel. ON = fonctionnalité Windows active."
+                       Opacity="0.7" TextWrapping="Wrap"/>
+
+            <!-- LLMNR -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="LLMNR" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Text="Protocole de résolution local. OFF = protégé contre les attaques relay. Recommandé : OFF."
+                                   Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <ToggleSwitch IsOn="{Binding LlmnrActive, Mode=TwoWay}" HorizontalAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <!-- SMBv1 -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="SMBv1" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Text="Protocole obsolète et vulnérable (EternalBlue/WannaCry). OFF = sécurisé. Reboot requis."
+                                   Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <ToggleSwitch IsOn="{Binding Smb1Active, Mode=TwoWay}" HorizontalAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <!-- SmartScreen / PUA -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="Protection PUA (SmartScreen renforcé)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Text="Bloque les applications potentiellement indésirables. ON = activé. Recommandé : ON."
+                                   Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <ToggleSwitch IsOn="{Binding PuaActive, Mode=TwoWay}" HorizontalAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <TextBlock Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

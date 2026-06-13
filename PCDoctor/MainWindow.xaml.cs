@@ -39,6 +39,12 @@ namespace PCDoctor
                 case "AccueilPage":
                     ContentFrame.Navigate(typeof(Views.AccueilPage));
                     break;
+                case "AuditsPage":
+                    ContentFrame.Navigate(typeof(Views.AuditsPage));
+                    break;
+                case "HardeningPage":
+                    ContentFrame.Navigate(typeof(Views.HardeningPage));
+                    break;
                 // les autres pages viendront ici
                 default:
                     ContentFrame.Content = new TextBlock
