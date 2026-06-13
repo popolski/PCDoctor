@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "PCDoctor (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "PCDoctor (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

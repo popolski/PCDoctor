@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="PCDoctor.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="PCDoctor">
+
+    <Grid>
+        <NavigationView
+            x:Name="NavView"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="True"
+            SelectionChanged="NavView_SelectionChanged"
+            Loaded="NavView_Loaded">
+
+            <NavigationView.MenuItems>
+
+                <NavigationViewItem Content="Accueil" Tag="AccueilPage">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE80F;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItemSeparator/>
+
+                <NavigationViewItem Content="Diagnostic" Icon="Find">
+                    <NavigationViewItem.MenuItems>
+                        <NavigationViewItem Content="Audits" Tag="AuditsPage"/>
+                        <NavigationViewItem Content="État système" Tag="EtatPage"/>
+                        <NavigationViewItem Content="Applications" Tag="AppsPage"/>
+                        <NavigationViewItem Content="Démarrage" Tag="StartupPage"/>
+                    </NavigationViewItem.MenuItems>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Optimisation" Icon="Repair">
+                    <NavigationViewItem.MenuItems>
+                        <NavigationViewItem Content="Nettoyage" Tag="NettoyagePage"/>
+                        <NavigationViewItem Content="Optimisations" Tag="OptimPage"/>
+                        <NavigationViewItem Content="Gaming" Tag="GamingPage"/>
+                        <NavigationViewItem Content="Bloatware" Tag="BloatwarePage"/>
+                    </NavigationViewItem.MenuItems>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Sécurité &amp; Vie privée" Icon="Permissions">
+                    <NavigationViewItem.MenuItems>
+                        <NavigationViewItem Content="Hardening" Tag="HardeningPage"/>
+                        <NavigationViewItem Content="Confidentialité" Tag="PrivacyPage"/>
+                        <NavigationViewItem Content="Réseau" Tag="NetworkPage"/>
+                    </NavigationViewItem.MenuItems>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Maintenance" Icon="Setting">
+                    <NavigationViewItem.MenuItems>
+                        <NavigationViewItem Content="Mises à jour Windows" Tag="UpdatesPage"/>
+                        <NavigationViewItem Content="Pilotes" Tag="DriversPage"/>
+                        <NavigationViewItem Content="Planificateur" Tag="PlanificateurPage"/>
+                    </NavigationViewItem.MenuItems>
+                </NavigationViewItem>
+
+            </NavigationView.MenuItems>
+
+            <Frame x:Name="ContentFrame"/>
+
+        </NavigationView>
+    </Grid>
+</Window>
