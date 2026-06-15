@@ -48,6 +48,9 @@ namespace PCDoctor
                 case "PrivacyPage":
                     ContentFrame.Navigate(typeof(Views.PrivacyPage));
                     break;
+                case "NettoyagePage":
+                    ContentFrame.Navigate(typeof(Views.NettoyagePage));
+                    break;
                 // les autres pages viendront ici
                 default:
                     ContentFrame.Content = new TextBlock
