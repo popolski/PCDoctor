@@ -45,6 +45,9 @@ namespace PCDoctor
                 case "HardeningPage":
                     ContentFrame.Navigate(typeof(Views.HardeningPage));
                     break;
+                case "PrivacyPage":
+                    ContentFrame.Navigate(typeof(Views.PrivacyPage));
+                    break;
                 // les autres pages viendront ici
                 default:
                     ContentFrame.Content = new TextBlock

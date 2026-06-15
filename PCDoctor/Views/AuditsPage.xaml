@@ -45,10 +45,10 @@
                 IsReadOnly="True"
                 GridLinesVisibility="Horizontal">
                 <controls:DataGrid.Columns>
-                    <controls:DataGridTextColumn Header="{Binding H1, Mode=OneWay}" Binding="{Binding Col1}" Width="2*"/>
-                    <controls:DataGridTextColumn Header="{Binding H2, Mode=OneWay}" Binding="{Binding Col2}" Width="*"/>
-                    <controls:DataGridTextColumn Header="{Binding H3, Mode=OneWay}" Binding="{Binding Col3}" Width="*"/>
-                    <controls:DataGridTextColumn Header="{Binding H4, Mode=OneWay}" Binding="{Binding Col4}" Width="3*"/>
+                    <controls:DataGridTextColumn Header="Élément" Binding="{Binding Col1}" Width="2*"/>
+                    <controls:DataGridTextColumn Header="État / Valeur" Binding="{Binding Col2}" Width="*"/>
+                    <controls:DataGridTextColumn Header="Détail" Binding="{Binding Col3}" Width="*"/>
+                    <controls:DataGridTextColumn Header="Chemin / Info" Binding="{Binding Col4}" Width="3*"/>
                 </controls:DataGrid.Columns>
             </controls:DataGrid>
         </Grid>
