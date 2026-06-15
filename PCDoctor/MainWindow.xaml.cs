@@ -51,6 +51,12 @@ namespace PCDoctor
                 case "NettoyagePage":
                     ContentFrame.Navigate(typeof(Views.NettoyagePage));
                     break;
+                case "NetworkPage":
+                    ContentFrame.Navigate(typeof(Views.NetworkPage));
+                    break;
+                case "OptimPage":
+                    ContentFrame.Navigate(typeof(Views.OptimPage));
+                    break;
                 // les autres pages viendront ici
                 default:
                     ContentFrame.Content = new TextBlock

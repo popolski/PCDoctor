@@ -20,6 +20,8 @@
     <None Remove="Views\AuditsPage.xaml" />
     <None Remove="Views\HardeningPage.xaml" />
     <None Remove="Views\NettoyagePage.xaml" />
+    <None Remove="Views\NetworkPage.xaml" />
+    <None Remove="Views\OptimPage.xaml" />
     <None Remove="Views\PrivacyPage.xaml" />
   </ItemGroup>
 
@@ -51,6 +53,16 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
     <PackageReference Include="System.Management" Version="10.0.9" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\OptimPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\NetworkPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\NettoyagePage.xaml">
