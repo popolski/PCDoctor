@@ -57,6 +57,9 @@ namespace PCDoctor
                 case "OptimPage":
                     ContentFrame.Navigate(typeof(Views.OptimPage));
                     break;
+                case "StartupPage":
+                    ContentFrame.Navigate(typeof(Views.StartupPage));
+                    break;
                 // les autres pages viendront ici
                 default:
                     ContentFrame.Content = new TextBlock

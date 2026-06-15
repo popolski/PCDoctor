@@ -23,6 +23,7 @@
     <None Remove="Views\NetworkPage.xaml" />
     <None Remove="Views\OptimPage.xaml" />
     <None Remove="Views\PrivacyPage.xaml" />
+    <None Remove="Views\StartupPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,6 +54,11 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
     <PackageReference Include="System.Management" Version="10.0.9" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\StartupPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\OptimPage.xaml">
