@@ -17,6 +17,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\AccueilPage.xaml" />
+    <None Remove="Views\AppsPage.xaml" />
     <None Remove="Views\AuditsPage.xaml" />
     <None Remove="Views\BloatwarePage.xaml" />
     <None Remove="Views\HardeningPage.xaml" />
@@ -55,6 +56,11 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
     <PackageReference Include="System.Management" Version="10.0.9" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\AppsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\BloatwarePage.xaml">

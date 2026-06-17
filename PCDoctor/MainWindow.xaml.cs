@@ -63,6 +63,9 @@ namespace PCDoctor
                 case "BloatwarePage":
                     ContentFrame.Navigate(typeof(Views.BloatwarePage));
                     break;
+                case "AppsPage":
+                    ContentFrame.Navigate(typeof(Views.AppsPage));
+                    break;
                 // les autres pages viendront ici
                 default:
                     ContentFrame.Content = new TextBlock
