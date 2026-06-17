@@ -26,6 +26,7 @@
     <None Remove="Views\NetworkPage.xaml" />
     <None Remove="Views\OptimPage.xaml" />
     <None Remove="Views\PrivacyPage.xaml" />
+    <None Remove="Views\SettingsPage.xaml" />
     <None Remove="Views\StartupPage.xaml" />
   </ItemGroup>
 
@@ -58,6 +59,11 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="10.0.9" />
     <PackageReference Include="System.Management" Version="10.0.9" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\EtatPage.xaml">
