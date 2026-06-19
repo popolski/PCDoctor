@@ -1,21 +1,40 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Management;
+using System.Runtime.InteropServices;
+using System.Text.Json;
 
 namespace PCDoctor.Services
 {
     public class ProcessInfo
     {
-        public string Name { get; set; } = "";
+        public string Name      { get; set; } = "";
         public string MemoryText { get; set; } = "";
-        public double MemoryMb { get; set; }
+        public double MemoryMb  { get; set; }
     }
 
     public class MonitorService
     {
         private PerformanceCounter? _cpuCounter;
+
+        // P/Invoke pour la RAM — rapide, sans WMI
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MEMORYSTATUSEX
+        {
+            public uint   dwLength;
+            public uint   dwMemoryLoad;
+            public ulong  ullTotalPhys;
+            public ulong  ullAvailPhys;
+            public ulong  ullTotalPageFile;
+            public ulong  ullAvailPageFile;
+            public ulong  ullTotalVirtual;
+            public ulong  ullAvailVirtual;
+            public ulong  ullAvailExtendedVirtual;
+        }
+
+        [DllImport("kernel32.dll")]
+        private static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
 
         public MonitorService()
         {
@@ -27,90 +46,99 @@ namespace PCDoctor.Services
             catch { _cpuCounter = null; }
         }
 
-        // CPU global en % (temps réel)
         public int GetCpuPercent()
         {
             try { return _cpuCounter != null ? (int)Math.Round(_cpuCounter.NextValue()) : 0; }
             catch { return 0; }
         }
 
-        // RAM : (utilisée Go, total Go, pourcentage)
         public (double used, double total, int pct) GetRam()
         {
             try
             {
-                using var s = new ManagementObjectSearcher("SELECT TotalVisibleMemorySize, FreePhysicalMemory FROM Win32_OperatingSystem");
-                foreach (var o in s.Get())
-                {
-                    double totalKb = Convert.ToDouble(o["TotalVisibleMemorySize"]);
-                    double freeKb = Convert.ToDouble(o["FreePhysicalMemory"]);
-                    double totalGb = Math.Round(totalKb / 1024 / 1024, 1);
-                    double usedGb = Math.Round((totalKb - freeKb) / 1024 / 1024, 1);
-                    int pct = (int)Math.Round((totalKb - freeKb) / totalKb * 100);
-                    return (usedGb, totalGb, pct);
-                }
+                var ms = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
+                if (!GlobalMemoryStatusEx(ref ms)) return (0, 0, 0);
+                double total = Math.Round(ms.ullTotalPhys / 1024.0 / 1024 / 1024, 1);
+                double avail = Math.Round(ms.ullAvailPhys / 1024.0 / 1024 / 1024, 1);
+                double used  = Math.Round(total - avail, 1);
+                int    pct   = (int)ms.dwMemoryLoad;
+                return (used, total, pct);
             }
-            catch { }
-            return (0, 0, 0);
+            catch { return (0, 0, 0); }
         }
 
-        // Infos détaillées statiques
+        public string GetUptime()
+        {
+            try
+            {
+                var up = TimeSpan.FromMilliseconds(Environment.TickCount64);
+                return up.TotalDays >= 1
+                    ? $"{up.Days}j {up.Hours}h {up.Minutes}min"
+                    : $"{up.Hours}h {up.Minutes}min";
+            }
+            catch { return "Inconnu"; }
+        }
+
+        // Infos détaillées (appelé une seule fois à l'ouverture de la page)
         public Dictionary<string, string> GetDetails()
         {
             var d = new Dictionary<string, string>();
             try
             {
-                using (var s = new ManagementObjectSearcher("SELECT Name, NumberOfCores, NumberOfLogicalProcessors FROM Win32_Processor"))
-                    foreach (var o in s.Get())
-                    {
-                        d["Processeur"] = o["Name"]?.ToString() ?? "";
-                        d["Cœurs"] = $"{o["NumberOfCores"]} cœurs / {o["NumberOfLogicalProcessors"]} threads";
-                    }
-                using (var s = new ManagementObjectSearcher("SELECT Manufacturer, Product FROM Win32_BaseBoard"))
-                    foreach (var o in s.Get())
-                        d["Carte mère"] = $"{o["Manufacturer"]} {o["Product"]}";
-                using (var s = new ManagementObjectSearcher("SELECT SMBIOSBIOSVersion FROM Win32_BIOS"))
-                    foreach (var o in s.Get())
-                        d["BIOS"] = o["SMBIOSBIOSVersion"]?.ToString() ?? "";
-                using (var s = new ManagementObjectSearcher("SELECT Name, AdapterRAM FROM Win32_VideoController"))
-                    foreach (var o in s.Get())
-                        d["Carte graphique"] = o["Name"]?.ToString() ?? "";
-                using (var s = new ManagementObjectSearcher("SELECT Caption, Version FROM Win32_OperatingSystem"))
-                    foreach (var o in s.Get())
-                        d["Système"] = $"{o["Caption"]} (build {o["Version"]})";
+                var json = RunPs(
+                    "@(Get-WmiObject Win32_Processor | Select-Object -First 1 Name, NumberOfCores, NumberOfLogicalProcessors) | ConvertTo-Json -Compress");
+                using var doc = JsonDocument.Parse(json);
+                var cpu = doc.RootElement.ValueKind == JsonValueKind.Array
+                    ? doc.RootElement[0] : doc.RootElement;
+                d["Processeur"] = Str(cpu, "Name");
+                d["Coeurs"]     = $"{Str(cpu, "NumberOfCores")} coeurs / {Str(cpu, "NumberOfLogicalProcessors")} threads";
             }
-            catch (Exception e) { Logger.Warn($"GetDetails : {e.Message}"); }
+            catch { }
+
+            try
+            {
+                var json = RunPs("Get-WmiObject Win32_BaseBoard | Select-Object Manufacturer, Product | ConvertTo-Json -Compress");
+                using var doc = JsonDocument.Parse(json);
+                var mb = doc.RootElement;
+                d["Carte mere"] = $"{Str(mb, "Manufacturer")} {Str(mb, "Product")}".Trim();
+            }
+            catch { }
+
+            try
+            {
+                d["BIOS"] = RunPs("Get-WmiObject Win32_BIOS | Select-Object -ExpandProperty SMBIOSBIOSVersion").Trim();
+            }
+            catch { }
+
+            try
+            {
+                d["Carte graphique"] = RunPs("Get-WmiObject Win32_VideoController | Select-Object -First 1 -ExpandProperty Name").Trim();
+            }
+            catch { }
+
+            try
+            {
+                var json = RunPs("Get-WmiObject Win32_OperatingSystem | Select-Object Caption, Version | ConvertTo-Json -Compress");
+                using var doc = JsonDocument.Parse(json);
+                var os = doc.RootElement;
+                d["Systeme"] = $"{Str(os, "Caption")} (build {Str(os, "Version")})";
+            }
+            catch { }
+
             return d;
         }
 
-        // Uptime réel basé sur LastBootUpTime (fiable même avec Fast Startup)
-        public string GetUptime()
-        {
-            try
-            {
-                using var s = new ManagementObjectSearcher("SELECT LastBootUpTime FROM Win32_OperatingSystem");
-                foreach (var o in s.Get())
-                {
-                    string raw = o["LastBootUpTime"]?.ToString() ?? "";
-                    var boot = ManagementDateTimeConverter.ToDateTime(raw);
-                    var up = DateTime.Now - boot;
-                    if (up.TotalDays >= 1)
-                        return $"{up.Days}j {up.Hours}h {up.Minutes}min";
-                    return $"{up.Hours}h {up.Minutes}min";
-                }
-            }
-            catch (Exception e) { Logger.Warn($"GetUptime : {e.Message}"); }
-            return "Inconnu";
-        }
-
-        // Top processus par mémoire
         public List<ProcessInfo> GetTopProcesses(int count = 10)
         {
             var list = new List<ProcessInfo>();
             try
             {
                 var procs = Process.GetProcesses()
-                    .Select(p => { try { return new ProcessInfo { Name = p.ProcessName, MemoryMb = Math.Round(p.WorkingSet64 / 1024.0 / 1024, 1) }; } catch { return null; } })
+                    .Select(p =>
+                    {
+                        try { return new ProcessInfo { Name = p.ProcessName, MemoryMb = Math.Round(p.WorkingSet64 / 1024.0 / 1024, 1) }; }
+                        catch { return null; }
+                    })
                     .Where(x => x != null && x.MemoryMb > 0)
                     .OrderByDescending(x => x!.MemoryMb)
                     .Take(count);
@@ -123,5 +151,23 @@ namespace PCDoctor.Services
             catch (Exception e) { Logger.Warn($"GetTopProcesses : {e.Message}"); }
             return list;
         }
+
+        private static string RunPs(string cmd)
+        {
+            var psi = new ProcessStartInfo("powershell",
+                $"-NoProfile -NonInteractive -Command \"{cmd}\"")
+            {
+                RedirectStandardOutput = true,
+                UseShellExecute        = false,
+                CreateNoWindow         = true
+            };
+            using var p = Process.Start(psi)!;
+            var o = p.StandardOutput.ReadToEnd();
+            p.WaitForExit();
+            return o.Trim();
+        }
+
+        private static string Str(JsonElement el, string prop) =>
+            el.TryGetProperty(prop, out var v) ? v.ToString() : "";
     }
 }

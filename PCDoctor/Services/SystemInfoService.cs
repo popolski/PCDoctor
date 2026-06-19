@@ -1,60 +1,75 @@
-﻿using System;
-using System.Management;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text.Json;
+using Microsoft.Win32;
 
 namespace PCDoctor.Services
 {
-    // Logique métier pure : récupère les infos système. Réutilisable, testable.
     public class SystemInfoService
     {
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MEMORYSTATUSEX
+        {
+            public uint  dwLength;
+            public uint  dwMemoryLoad;
+            public ulong ullTotalPhys;
+            public ulong ullAvailPhys;
+            public ulong ullTotalPageFile;
+            public ulong ullAvailPageFile;
+            public ulong ullTotalVirtual;
+            public ulong ullAvailVirtual;
+            public ulong ullAvailExtendedVirtual;
+        }
+
+        [DllImport("kernel32.dll")]
+        private static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
+
         public string GetOsName()
         {
             try
             {
-                using var searcher = new ManagementObjectSearcher("SELECT Caption FROM Win32_OperatingSystem");
-                foreach (var o in searcher.Get())
-                    return o["Caption"]?.ToString() ?? "Inconnu";
+                using var key = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+                return key?.GetValue("ProductName")?.ToString() ?? "Windows";
             }
-            catch { }
-            return "Inconnu";
+            catch { return "Windows"; }
         }
 
         public (double total, double used, int pct) GetRam()
         {
             try
             {
-                using var searcher = new ManagementObjectSearcher(
-                    "SELECT TotalVisibleMemorySize, FreePhysicalMemory FROM Win32_OperatingSystem");
-                foreach (var o in searcher.Get())
-                {
-                    double totalKb = Convert.ToDouble(o["TotalVisibleMemorySize"]);
-                    double freeKb = Convert.ToDouble(o["FreePhysicalMemory"]);
-                    double totalGb = Math.Round(totalKb / 1024 / 1024, 1);
-                    double usedGb = Math.Round((totalKb - freeKb) / 1024 / 1024, 1);
-                    int pct = (int)Math.Round((totalKb - freeKb) / totalKb * 100);
-                    return (totalGb, usedGb, pct);
-                }
+                var ms = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
+                if (!GlobalMemoryStatusEx(ref ms)) return (0, 0, 0);
+                double total = Math.Round(ms.ullTotalPhys / 1024.0 / 1024 / 1024, 1);
+                double avail = Math.Round(ms.ullAvailPhys / 1024.0 / 1024 / 1024, 1);
+                double used  = Math.Round(total - avail, 1);
+                return (total, used, (int)ms.dwMemoryLoad);
             }
-            catch { }
-            return (0, 0, 0);
+            catch { return (0, 0, 0); }
         }
 
         public string GetMachineName() => Environment.MachineName;
-        public System.Collections.Generic.List<DiskInfo> GetDisks()
+
+        public List<DiskInfo> GetDisks()
         {
-            var list = new System.Collections.Generic.List<DiskInfo>();
+            var list = new List<DiskInfo>();
             try
             {
-                foreach (var d in System.IO.DriveInfo.GetDrives())
+                foreach (var d in DriveInfo.GetDrives())
                 {
-                    if (!d.IsReady || d.DriveType != System.IO.DriveType.Fixed) continue;
+                    if (!d.IsReady || d.DriveType != DriveType.Fixed) continue;
                     double totalGb = Math.Round(d.TotalSize / 1024.0 / 1024 / 1024, 1);
-                    double freeGb = Math.Round(d.TotalFreeSpace / 1024.0 / 1024 / 1024, 1);
-                    double usedGb = Math.Round(totalGb - freeGb, 1);
-                    int pct = totalGb > 0 ? (int)Math.Round(usedGb / totalGb * 100) : 0;
+                    double freeGb  = Math.Round(d.TotalFreeSpace / 1024.0 / 1024 / 1024, 1);
+                    double usedGb  = Math.Round(totalGb - freeGb, 1);
+                    int    pct     = totalGb > 0 ? (int)Math.Round(usedGb / totalGb * 100) : 0;
                     list.Add(new DiskInfo
                     {
-                        Letter = d.Name.TrimEnd('\\'),
-                        Text = $"{usedGb} Go / {totalGb} Go ({freeGb} Go libres)",
+                        Letter  = d.Name.TrimEnd('\\'),
+                        Text    = $"{usedGb} Go / {totalGb} Go ({freeGb} Go libres)",
                         Percent = pct
                     });
                 }
@@ -67,39 +82,49 @@ namespace PCDoctor.Services
         {
             try
             {
-                var scope = new ManagementScope(@"\\.\root\Microsoft\Windows\Defender");
-                scope.Connect();
-                var query = new ObjectQuery("SELECT * FROM MSFT_MpComputerStatus");
-                using var searcher = new ManagementObjectSearcher(scope, query);
-                foreach (var o in searcher.Get())
-                {
-                    bool rtp = Convert.ToBoolean(o["RealTimeProtectionEnabled"]);
-                    bool av = Convert.ToBoolean(o["AntivirusEnabled"]);
-                    string t = (rtp && av) ? "Protection active" : "Vérifiez la protection";
-                    return (rtp, av, t);
-                }
+                var json = RunPs(
+                    "Get-MpComputerStatus | Select-Object RealTimeProtectionEnabled, AntivirusEnabled | ConvertTo-Json -Compress");
+                using var doc = JsonDocument.Parse(json);
+                var o = doc.RootElement;
+                bool rtp = o.TryGetProperty("RealTimeProtectionEnabled", out var r) && r.ValueKind == JsonValueKind.True;
+                bool av  = o.TryGetProperty("AntivirusEnabled",          out var a) && a.ValueKind == JsonValueKind.True;
+                return (rtp, av, (rtp && av) ? "Protection active" : "Verifiez la protection");
             }
-            catch { }
-            return (false, false, "État inconnu");
+            catch { return (false, false, "Etat inconnu"); }
         }
 
         public string GetUptime()
         {
             try
             {
-                var ms = (ulong)Environment.TickCount64;
-                var ts = TimeSpan.FromMilliseconds(ms);
-                return $"{ts.Days}j {ts.Hours}h {ts.Minutes}min";
+                var up = TimeSpan.FromMilliseconds(Environment.TickCount64);
+                return up.TotalDays >= 1
+                    ? $"{up.Days}j {up.Hours}h {up.Minutes}min"
+                    : $"{up.Hours}h {up.Minutes}min";
             }
             catch { return "Inconnu"; }
         }
+
+        private static string RunPs(string cmd)
+        {
+            var psi = new ProcessStartInfo("powershell",
+                $"-NoProfile -NonInteractive -Command \"{cmd}\"")
+            {
+                RedirectStandardOutput = true,
+                UseShellExecute        = false,
+                CreateNoWindow         = true
+            };
+            using var p = Process.Start(psi)!;
+            var o = p.StandardOutput.ReadToEnd();
+            p.WaitForExit();
+            return o.Trim();
+        }
     }
 
-    // Petite classe pour représenter un disque
     public class DiskInfo
     {
-        public string Letter { get; set; } = "";
-        public string Text { get; set; } = "";
-        public int Percent { get; set; }
+        public string Letter  { get; set; } = "";
+        public string Text    { get; set; } = "";
+        public int    Percent { get; set; }
     }
 }
