@@ -54,6 +54,31 @@ namespace PCDoctor.Views
             };
             if (App.MainWindowRef is MainWindow mw)
                 mw.ApplyTheme(theme);
+            SaveTheme(theme);
+        }
+
+        internal static void SaveTheme(ElementTheme theme)
+        {
+            try
+            {
+                var folder = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PCDoctor");
+                Directory.CreateDirectory(folder);
+                File.WriteAllText(Path.Combine(folder, "theme.txt"), theme.ToString());
+            }
+            catch { }
+        }
+
+        internal static ElementTheme LoadTheme()
+        {
+            try
+            {
+                var path = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PCDoctor", "theme.txt");
+                if (!File.Exists(path)) return ElementTheme.Default;
+                return Enum.TryParse<ElementTheme>(File.ReadAllText(path).Trim(), out var t) ? t : ElementTheme.Default;
+            }
+            catch { return ElementTheme.Default; }
         }
 
         private void OpenLogs_Click(object sender, RoutedEventArgs e)

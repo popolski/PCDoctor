@@ -49,6 +49,10 @@ namespace PCDoctor
             MainWindowRef = _window;
             _window.Activate();
 
+            // Restaurer le thème sauvegardé
+            var theme = Views.SettingsPage.LoadTheme();
+            if (theme != Microsoft.UI.Xaml.ElementTheme.Default)
+                (_window as MainWindow)?.ApplyTheme(theme);
         }
     }
 }
