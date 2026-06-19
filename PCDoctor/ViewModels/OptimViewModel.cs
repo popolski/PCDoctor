@@ -12,6 +12,7 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool fastStartupActive;
         [ObservableProperty] private bool powerThrottlingDisabled;
         [ObservableProperty] private bool memoryCompressionActive;
+        [ObservableProperty] private bool utcClockActive;
         [ObservableProperty] private bool sysMainActive;
         [ObservableProperty] private bool searchIndexActive;
         [ObservableProperty] private bool werActive;
@@ -26,6 +27,7 @@ namespace PCDoctor.ViewModels
             FastStartupActive       = _svc.IsFastStartupActive();
             PowerThrottlingDisabled = _svc.IsPowerThrottlingDisabled();
             MemoryCompressionActive = _svc.IsMemoryCompressionActive();
+            UtcClockActive          = _svc.IsUtcClockActive();
             SysMainActive           = _svc.IsSysMainActive();
             SearchIndexActive       = _svc.IsSearchIndexActive();
             WerActive               = _svc.IsWerActive();
@@ -58,6 +60,13 @@ namespace PCDoctor.ViewModels
             if (_loading) return;
             _svc.SetMemoryCompression(v);
             StatusText = v ? "Compression mémoire activée" : "Compression mémoire désactivée";
+        }
+
+        partial void OnUtcClockActiveChanged(bool v)
+        {
+            if (_loading) return;
+            _svc.SetUtcClock(v);
+            StatusText = v ? "Horloge UTC activée - redémarrage requis (dual-boot Linux)" : "Horloge locale restaurée (heure locale en RTC)";
         }
 
         partial void OnSysMainActiveChanged(bool v)

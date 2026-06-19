@@ -70,6 +70,25 @@ namespace PCDoctor.Services
             Logger.Action($"Compression mémoire {(active ? "activée" : "désactivée")}");
         }
 
+        // ── Horloge UTC (dual-boot Linux) ────────────────────────────────────
+        // RealTimeIsUniversal = 1 -> Windows stocke l'heure RTC en UTC (comme Linux)
+        public bool IsUtcClockActive()
+        {
+            var v = RegistryHelper.GetDword(
+                @"SYSTEM\CurrentControlSet\Control\TimeZoneInformation", "RealTimeIsUniversal");
+            return v == 1;
+        }
+        public void SetUtcClock(bool active)
+        {
+            if (active)
+                RegistryHelper.SetDwordHklm(
+                    @"SYSTEM\CurrentControlSet\Control\TimeZoneInformation", "RealTimeIsUniversal", 1);
+            else
+                RegistryHelper.DeleteValueHklm(
+                    @"SYSTEM\CurrentControlSet\Control\TimeZoneInformation", "RealTimeIsUniversal");
+            Logger.Action($"Horloge UTC {(active ? "activée" : "désactivée")}");
+        }
+
         // ── SysMain (Superfetch) ──────────────────────────────────────────────
         public bool IsSysMainActive()
         {

@@ -135,6 +135,42 @@ namespace PCDoctor.Services
             catch { }
         }
 
+        // ─── Wi-Fi Sense ───
+        // Désactive le partage automatique de réseaux Wi-Fi avec les contacts
+        public bool IsWifiSenseActive()
+        {
+            var v = RegistryHelper.GetDword(
+                @"SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config", "AutoConnectAllowedOEM");
+            return v != 0; // 0 = désactivé
+        }
+        public void SetWifiSense(bool active)
+        {
+            RegistryHelper.SetDwordHklm(
+                @"SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config", "AutoConnectAllowedOEM", active ? 1 : 0);
+            // Double clé policy pour couvrir toutes les versions Win10/11
+            RegistryHelper.SetDwordHklm(
+                @"SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting", "value", active ? 1 : 0);
+            RegistryHelper.SetDwordHklm(
+                @"SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots", "value", active ? 1 : 0);
+            Logger.Action($"Wi-Fi Sense {(active ? "réactivé" : "désactivé")}");
+        }
+
+        // ─── Applications en arrière-plan ───
+        // GlobalUserDisabled = 1 -> toutes les apps bloquées en arrière-plan
+        public bool IsBackgroundAppsActive()
+        {
+            var v = GetDwordHkcu(
+                @"Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications", "GlobalUserDisabled");
+            return v != 1; // 1 = désactivé
+        }
+        public void SetBackgroundApps(bool active)
+        {
+            SetDwordHkcu(
+                @"Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications",
+                "GlobalUserDisabled", active ? 0 : 1);
+            Logger.Action($"Applications arrière-plan {(active ? "autorisées" : "bloquées")}");
+        }
+
         // ─── Copilot Windows ───
         // AllowCopilot = 0 via policy -> désactivé
         public bool IsCopilotActive()

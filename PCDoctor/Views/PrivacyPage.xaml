@@ -105,6 +105,33 @@
                 </Grid>
             </Border>
 
+            <!-- Wi-Fi Sense + Apps arrière-plan -->
+            <TextBlock Text="Réseau &amp; Applications" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Wi-Fi Sense" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Partage automatique de vos réseaux Wi-Fi avec vos contacts Outlook/Skype. OFF = vos mots de passe Wi-Fi ne sont jamais partagés.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding WifiSenseActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Applications en arrière-plan" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Autorise les apps à recevoir des infos, envoyer des notifications et se mettre à jour même quand vous ne les utilisez pas. OFF = bloque tout.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding BackgroundAppsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
             <!-- Recall + Localisation -->
             <TextBlock Text="Surveillance &amp; Localisation" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
 

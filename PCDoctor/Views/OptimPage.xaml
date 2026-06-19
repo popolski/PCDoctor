@@ -70,6 +70,19 @@
                 </Grid>
             </Border>
 
+            <!-- Horloge UTC -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Horloge matérielle en UTC (dual-boot Linux)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = Windows stocke l'heure BIOS en UTC, comme Linux. Évite le décalage d'heure quand on alterne les deux OS. Redémarrage requis.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding UtcClockActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
             <!-- Services système -->
             <TextBlock Text="Services système" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
 

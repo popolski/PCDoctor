@@ -16,6 +16,8 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool officeActive;
         [ObservableProperty] private bool recallActive;
         [ObservableProperty] private bool locationActive;
+        [ObservableProperty] private bool wifiSenseActive;
+        [ObservableProperty] private bool backgroundAppsActive;
         [ObservableProperty] private bool copilotActive;
         [ObservableProperty] private bool aiSearchActive;
         [ObservableProperty] private bool settingsSuggestionsActive;
@@ -34,6 +36,8 @@ namespace PCDoctor.ViewModels
             OfficeActive               = _svc.IsOfficeActive();
             RecallActive               = _svc.IsRecallActive();
             LocationActive             = _svc.IsLocationActive();
+            WifiSenseActive            = _svc.IsWifiSenseActive();
+            BackgroundAppsActive       = _svc.IsBackgroundAppsActive();
             CopilotActive              = _svc.IsCopilotActive();
             AiSearchActive             = _svc.IsAiSearchActive();
             SettingsSuggestionsActive  = _svc.IsSettingsSuggestionsActive();
@@ -46,6 +50,8 @@ namespace PCDoctor.ViewModels
         partial void OnAdsActiveChanged(bool v)                 { if (_loading) return; _svc.SetAds(v);                  StatusText = v ? "Pubs réactivées" : "Pubs désactivées"; }
         partial void OnAdIdActiveChanged(bool v)                { if (_loading) return; _svc.SetAdId(v);                 StatusText = v ? "Advertising ID réactivé" : "Advertising ID désactivé"; }
         partial void OnOfficeActiveChanged(bool v)              { if (_loading) return; _svc.SetOffice(v);               StatusText = v ? "Télémétrie Office réactivée" : "Télémétrie Office désactivée"; }
+        partial void OnWifiSenseActiveChanged(bool v)          { if (_loading) return; _svc.SetWifiSense(v);          StatusText = v ? "Wi-Fi Sense activé" : "Wi-Fi Sense désactivé (partage de réseaux bloqué)"; }
+        partial void OnBackgroundAppsActiveChanged(bool v)     { if (_loading) return; _svc.SetBackgroundApps(v);     StatusText = v ? "Applications en arrière-plan autorisées" : "Applications en arrière-plan bloquées"; }
         partial void OnRecallActiveChanged(bool v)              { if (_loading) return; _svc.SetRecall(v);               StatusText = v ? "Windows Recall réactivé" : "Windows Recall désactivé (screenshots IA stoppés)"; }
         partial void OnLocationActiveChanged(bool v)            { if (_loading) return; _svc.SetLocation(v);             StatusText = v ? "Localisation activée" : "Localisation désactivée"; }
         partial void OnCopilotActiveChanged(bool v)             { if (_loading) return; _svc.SetCopilot(v);              StatusText = v ? "Copilot réactivé" : "Copilot désactivé"; }
