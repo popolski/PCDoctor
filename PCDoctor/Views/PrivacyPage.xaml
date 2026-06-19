@@ -105,6 +105,48 @@
                 </Grid>
             </Border>
 
+            <!-- Séparateur IA / Copilot -->
+            <TextBlock Text="Intelligence artificielle" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+
+            <!-- Copilot -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Copilot Windows" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Assistant IA intégré à Windows 11. OFF = désactivé via stratégie (bouton de barre des tâches supprimé).</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding CopilotActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Suggestions IA recherche -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Suggestions IA dans la recherche" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Résultats enrichis par IA dans la barre de recherche Windows. OFF = recherche classique locale/web uniquement.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding AiSearchActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Suggestions dans Paramètres -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Contenu suggéré dans les Paramètres" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Windows affiche des suggestions et promotions dans l'app Paramètres. OFF = interface épurée.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SettingsSuggestionsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
             <TextBlock Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic" Margin="0,8,0,0"/>
         </StackPanel>
     </ScrollViewer>

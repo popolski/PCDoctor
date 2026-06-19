@@ -92,6 +92,46 @@ namespace PCDoctor.Services
             SetDwordHkcu(@"Software\Policies\Microsoft\Office\16.0\Common", "SendCustomerData", active ? 1 : 0);
         }
 
+        // ─── Copilot Windows ───
+        // AllowCopilot = 0 via policy -> désactivé
+        public bool IsCopilotActive()
+        {
+            var v = RegistryHelper.GetDword(@"SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot", "TurnOffWindowsCopilot");
+            return v != 1; // 1 = désactivé par policy
+        }
+        public void SetCopilot(bool active)
+        {
+            if (active)
+                RegistryHelper.DeleteValueHklm(@"SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot", "TurnOffWindowsCopilot");
+            else
+                RegistryHelper.SetDwordHklm(@"SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot", "TurnOffWindowsCopilot", 1);
+            Logger.Action($"Copilot {(active ? "réactivé" : "désactivé")}");
+        }
+
+        // ─── Suggestions IA dans la recherche Windows ───
+        public bool IsAiSearchActive()
+        {
+            var v = GetDwordHkcu(@"Software\Microsoft\Windows\CurrentVersion\SearchSettings", "IsDynamicSearchBoxEnabled");
+            return v != 0;
+        }
+        public void SetAiSearch(bool active)
+        {
+            SetDwordHkcu(@"Software\Microsoft\Windows\CurrentVersion\SearchSettings", "IsDynamicSearchBoxEnabled", active ? 1 : 0);
+            Logger.Action($"Suggestions IA recherche {(active ? "activées" : "désactivées")}");
+        }
+
+        // ─── Contenu suggéré dans les Paramètres ───
+        public bool IsSettingsSuggestionsActive()
+        {
+            var v = GetDwordHkcu(@"Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement", "ScoobeSystemSettingEnabled");
+            return v != 0;
+        }
+        public void SetSettingsSuggestions(bool active)
+        {
+            SetDwordHkcu(@"Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement", "ScoobeSystemSettingEnabled", active ? 1 : 0);
+            Logger.Action($"Suggestions dans Paramètres {(active ? "activées" : "désactivées")}");
+        }
+
         // ─── Helpers HKCU ───
         private int? GetDwordHkcu(string keyPath, string valueName)
         {
