@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="PCDoctor.Views.SystemToolsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:PCDoctor.ViewModels">
+    <Page.DataContext>
+        <vm:SystemToolsViewModel/>
+    </Page.DataContext>
+
+    <Grid Margin="40" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Outils système" FontSize="32" FontWeight="SemiBold"/>
+
+        <!-- Avertissement durée -->
+        <Border Grid.Row="1"
+                Background="{ThemeResource SystemFillColorCautionBackgroundBrush}"
+                CornerRadius="8" Padding="16,12">
+            <TextBlock TextWrapping="Wrap" FontSize="12">
+                SFC et DISM peuvent prendre plusieurs dizaines de minutes. Ne pas fermer l'application pendant l'opération.
+            </TextBlock>
+        </Border>
+
+        <!-- Actions -->
+        <StackPanel Grid.Row="2" Spacing="12">
+
+            <!-- SFC -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="Vérificateur de fichiers système (SFC)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.65" FontSize="12" TextWrapping="Wrap">
+                            Analyse et répare les fichiers systèmes Windows corrompus ou manquants. Durée : 5-10 min.
+                        </TextBlock>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Lancer SFC"
+                            Command="{Binding RunSfcCommand}"
+                            IsEnabled="{Binding CanRun}"
+                            VerticalAlignment="Center" Margin="16,0,0,0"/>
+                </Grid>
+            </Border>
+
+            <!-- DISM -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="Réparation de l'image Windows (DISM)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.65" FontSize="12" TextWrapping="Wrap">
+                            Répare le magasin de composants Windows via Windows Update. Durée : 15-30 min. Connexion internet requise.
+                        </TextBlock>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Lancer DISM"
+                            Command="{Binding RunDismCommand}"
+                            IsEnabled="{Binding CanRun}"
+                            VerticalAlignment="Center" Margin="16,0,0,0"/>
+                </Grid>
+            </Border>
+
+            <!-- Point de restauration -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="Point de restauration" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.65" FontSize="12" TextWrapping="Wrap">
+                            Crée un instantané de la configuration système. Permet de revenir en arrière si une manipulation tourne mal.
+                        </TextBlock>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Créer"
+                            Command="{Binding CreateRestorePointCommand}"
+                            IsEnabled="{Binding CanRun}"
+                            VerticalAlignment="Center" Margin="16,0,0,0"
+                            Style="{StaticResource AccentButtonStyle}"/>
+                </Grid>
+            </Border>
+
+        </StackPanel>
+
+        <!-- Journal live -->
+        <ScrollViewer Grid.Row="3" Margin="0,4,0,0" VerticalScrollBarVisibility="Auto">
+            <TextBlock Text="{Binding LogText}"
+                       FontFamily="Consolas" FontSize="11"
+                       TextWrapping="Wrap" Opacity="0.85"/>
+        </ScrollViewer>
+
+        <!-- Statut + ProgressRing -->
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic" VerticalAlignment="Center"/>
+            <ProgressRing Grid.Column="1" IsActive="{Binding IsRunning}" Width="24" Height="24"/>
+        </Grid>
+    </Grid>
+</Page>

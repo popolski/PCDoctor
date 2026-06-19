@@ -91,6 +91,9 @@ namespace PCDoctor
                 case "WingetPage":
                     ContentFrame.Navigate(typeof(Views.WingetPage));
                     break;
+                case "SystemToolsPage":
+                    ContentFrame.Navigate(typeof(Views.SystemToolsPage));
+                    break;
                 case "GhostServicesPage":
                     ContentFrame.Navigate(typeof(Views.GhostServicesPage));
                     break;

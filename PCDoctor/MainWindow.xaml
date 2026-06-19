@@ -61,6 +61,7 @@
                         <NavigationViewItem Content="Pilotes" Tag="DriversPage"/>
                         <NavigationViewItem Content="Planificateur" Tag="PlanificateurPage"/>
                         <NavigationViewItem Content="Paquets (Winget)" Tag="WingetPage"/>
+                        <NavigationViewItem Content="Outils système" Tag="SystemToolsPage"/>
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
 
