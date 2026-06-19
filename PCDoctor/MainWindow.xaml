@@ -43,6 +43,7 @@
                         <NavigationViewItem Content="Optimisations" Tag="OptimPage"/>
                         <NavigationViewItem Content="Gaming" Tag="GamingPage"/>
                         <NavigationViewItem Content="Bloatware" Tag="BloatwarePage"/>
+                        <NavigationViewItem Content="Services fantômes" Tag="GhostServicesPage"/>
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
 

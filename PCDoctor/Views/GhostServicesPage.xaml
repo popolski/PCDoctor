@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="PCDoctor.Views.GhostServicesPage"
+    x:Name="PageRoot"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:PCDoctor.ViewModels">
+    <Page.DataContext>
+        <vm:GhostServicesViewModel/>
+    </Page.DataContext>
+
+    <Grid Margin="40" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Titre -->
+        <TextBlock Grid.Row="0" Text="Services fantômes" FontSize="32" FontWeight="SemiBold"/>
+
+        <!-- Avertissement -->
+        <Border Grid.Row="1"
+                Background="{ThemeResource SystemFillColorCautionBackgroundBrush}"
+                CornerRadius="8" Padding="16,12">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Attention — suppression irréversible"
+                           FontWeight="SemiBold"/>
+                <TextBlock TextWrapping="Wrap" Opacity="0.85" FontSize="12">
+                    Un service fantôme est un service Windows dont le fichier exécutable n'existe plus sur le disque.
+                    Les services protégés (anti-cheat, composants système) sont automatiquement exclus de la liste.
+                    Vérifiez chaque entrée avant de supprimer.
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <!-- Barre d'actions -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10">
+            <Button Content="Analyser" Command="{Binding ScanCommand}"
+                    Style="{StaticResource AccentButtonStyle}"/>
+            <Button Content="Supprimer la sélection" Command="{Binding DeleteCommand}"
+                    IsEnabled="{Binding HasScanned}"/>
+            <ProgressRing IsActive="{Binding IsScanning}" Width="24" Height="24" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Liste des services fantômes -->
+        <ScrollViewer Grid.Row="3">
+            <ItemsControl ItemsSource="{Binding Services}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                CornerRadius="8" Padding="16,12" Margin="0,0,0,8"
+                                BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <CheckBox Grid.Column="0"
+                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                          VerticalAlignment="Top" Margin="0,2,14,0"/>
+
+                                <StackPanel Grid.Column="1" Spacing="4">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                        <Border CornerRadius="4" Padding="6,2"
+                                                Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="Binaire absent" FontSize="11"/>
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding DisplayName}" Opacity="0.75" FontSize="13"/>
+                                    <TextBlock Text="{Binding ImagePath}"
+                                               Opacity="0.5" FontSize="11" FontFamily="Consolas"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Statut -->
+        <TextBlock Grid.Row="4" Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic"/>
+    </Grid>
+</Page>
