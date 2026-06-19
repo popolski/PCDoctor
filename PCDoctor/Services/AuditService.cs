@@ -107,6 +107,131 @@ namespace PCDoctor.Services
             return r;
         }
 
+        // Extensions shell (menus contextuels, overlay icons...)
+        public AuditResult AuditShellExtensions()
+        {
+            var r = new AuditResult { Title = "Extensions shell", H1 = "Nom", H2 = "CLSID", H3 = "Fichier", H4 = "Type" };
+            try
+            {
+                // Lit HKLM\Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved
+                var json = RunPs(
+                    "@(Get-ItemProperty 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved' | " +
+                    "Get-Member -MemberType NoteProperty | Where-Object { $_.Name -match '^\\{' } | ForEach-Object {" +
+                    "  $clsid = $_.Name;" +
+                    "  $name = (Get-ItemProperty 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved').$clsid;" +
+                    "  $path = try { (Get-ItemProperty \"HKLM:\\Software\\Classes\\CLSID\\$clsid\\InProcServer32\" -ErrorAction Stop).'(default)' } catch { '' };" +
+                    "  [pscustomobject]@{ Clsid=$clsid; Name=$name; Path=$path }" +
+                    "}) | ConvertTo-Json -Compress");
+                int ms = 0;
+                foreach (var el in ParseArray(json))
+                {
+                    var path = Str(el, "Path");
+                    bool isMs = path.Contains(@"\Windows\", StringComparison.OrdinalIgnoreCase) ||
+                                path.Contains("Microsoft",  StringComparison.OrdinalIgnoreCase);
+                    if (isMs) { ms++; continue; }
+                    r.Rows.Add(new AuditRow
+                    {
+                        Col1 = Str(el, "Name"),
+                        Col2 = Str(el, "Clsid"),
+                        Col3 = string.IsNullOrEmpty(path) ? "Orpheline" : (System.IO.File.Exists(path) ? "OK" : "Manquant"),
+                        Col4 = path
+                    });
+                }
+                r.Subtitle = $"{r.Rows.Count} extensions tierces ({ms} Microsoft masquées)";
+            }
+            catch (Exception e) { r.Subtitle = "Erreur : " + e.Message; }
+            return r;
+        }
+
+        // Grands fichiers (>100 Mo)
+        public AuditResult AuditLargeFiles()
+        {
+            var r = new AuditResult { Title = "Grands fichiers (> 100 Mo)", H1 = "Fichier", H2 = "Taille", H3 = "Modifié", H4 = "Dossier" };
+            try
+            {
+                var json = RunPs(
+                    "@(Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Used -ne $null } | ForEach-Object {" +
+                    "  Get-ChildItem -Path \"$($_.Root)Users\" -Recurse -File -ErrorAction SilentlyContinue " +
+                    "    | Where-Object { $_.Length -gt 104857600 } " +
+                    "    | Select-Object Name, Length, LastWriteTime, DirectoryName" +
+                    "} | Sort-Object Length -Descending | Select-Object -First 50) | ConvertTo-Json -Compress");
+                long total = 0;
+                foreach (var el in ParseArray(json))
+                {
+                    long bytes = el.TryGetProperty("Length", out var lv) ? lv.GetInt64() : 0;
+                    total += bytes;
+                    string size = bytes >= 1_073_741_824
+                        ? $"{bytes / 1_073_741_824.0:F1} Go"
+                        : $"{bytes / 1_048_576.0:F0} Mo";
+                    string date = "";
+                    if (el.TryGetProperty("LastWriteTime", out var dv) && dv.ValueKind == JsonValueKind.String)
+                        date = dv.GetString()?.Substring(0, 10) ?? "";
+                    r.Rows.Add(new AuditRow
+                    {
+                        Col1 = Str(el, "Name"),
+                        Col2 = size,
+                        Col3 = date,
+                        Col4 = Str(el, "DirectoryName")
+                    });
+                }
+                string totalStr = total >= 1_073_741_824
+                    ? $"{total / 1_073_741_824.0:F1} Go"
+                    : $"{total / 1_048_576.0:F0} Mo";
+                r.Subtitle = $"{r.Rows.Count} fichiers (total {totalStr})";
+            }
+            catch (Exception e) { r.Subtitle = "Erreur : " + e.Message; }
+            return r;
+        }
+
+        // Extensions navigateurs (Chrome & Edge)
+        public AuditResult AuditBrowserExtensions()
+        {
+            var r = new AuditResult { Title = "Extensions navigateurs", H1 = "Extension", H2 = "Version", H3 = "Navigateur", H4 = "ID" };
+            try
+            {
+                string userRoot = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var browsers = new[]
+                {
+                    ("Chrome", System.IO.Path.Combine(userRoot, @"Google\Chrome\User Data\Default\Extensions")),
+                    ("Edge",   System.IO.Path.Combine(userRoot, @"Microsoft\Edge\User Data\Default\Extensions")),
+                    ("Brave",  System.IO.Path.Combine(userRoot, @"BraveSoftware\Brave-Browser\User Data\Default\Extensions")),
+                };
+                foreach (var (browser, extRoot) in browsers)
+                {
+                    if (!System.IO.Directory.Exists(extRoot)) continue;
+                    foreach (var extDir in System.IO.Directory.GetDirectories(extRoot))
+                    {
+                        string extId = System.IO.Path.GetFileName(extDir);
+                        if (extId is "Temp" or "temp") continue;
+                        // Cherche le manifest.json dans la version la plus récente
+                        string name = extId, version = "";
+                        foreach (var verDir in System.IO.Directory.GetDirectories(extDir))
+                        {
+                            var manifest = System.IO.Path.Combine(verDir, "manifest.json");
+                            if (!System.IO.File.Exists(manifest)) continue;
+                            try
+                            {
+                                var text = System.IO.File.ReadAllText(manifest);
+                                using var doc = JsonDocument.Parse(text);
+                                var root = doc.RootElement;
+                                if (root.TryGetProperty("name", out var nv)) name = nv.GetString() ?? extId;
+                                if (root.TryGetProperty("version", out var vv)) version = vv.GetString() ?? "";
+                                // Résoudre les locales __MSG_xxx__
+                                if (name.StartsWith("__MSG_")) name = extId;
+                            }
+                            catch { }
+                        }
+                        r.Rows.Add(new AuditRow { Col1 = name, Col2 = version, Col3 = browser, Col4 = extId });
+                    }
+                }
+                r.Subtitle = r.Rows.Count == 0
+                    ? "Aucune extension trouvée (Chrome/Edge/Brave)"
+                    : $"{r.Rows.Count} extension(s) installée(s)";
+            }
+            catch (Exception e) { r.Subtitle = "Erreur : " + e.Message; }
+            return r;
+        }
+
         // Infos système
         public AuditResult AuditSystemInfo()
         {

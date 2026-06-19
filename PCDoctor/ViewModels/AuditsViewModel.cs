@@ -19,10 +19,13 @@ namespace PCDoctor.ViewModels
 
         // [RelayCommand] génère automatiquement une commande "RunServicesCommand" etc.
         // que le bouton XAML appelle.
-        [RelayCommand] private void RunServices() => Apply(_audit.AuditServices());
-        [RelayCommand] private void RunDrivers() => Apply(_audit.AuditDrivers());
-        [RelayCommand] private void RunDefender() => Apply(_audit.AuditDefender());
-        [RelayCommand] private void RunSystemInfo() => Apply(_audit.AuditSystemInfo());
+        [RelayCommand] private void RunServices()         => Apply(_audit.AuditServices());
+        [RelayCommand] private void RunDrivers()          => Apply(_audit.AuditDrivers());
+        [RelayCommand] private void RunDefender()         => Apply(_audit.AuditDefender());
+        [RelayCommand] private void RunSystemInfo()       => Apply(_audit.AuditSystemInfo());
+        [RelayCommand] private void RunShellExtensions()  => Apply(_audit.AuditShellExtensions());
+        [RelayCommand] private void RunLargeFiles()       => Apply(_audit.AuditLargeFiles());
+        [RelayCommand] private void RunBrowserExtensions()=> Apply(_audit.AuditBrowserExtensions());
 
         private void Apply(AuditResult res)
         {
