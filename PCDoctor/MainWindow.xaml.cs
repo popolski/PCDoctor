@@ -88,6 +88,9 @@ namespace PCDoctor
                 case "PlanificateurPage":
                     ContentFrame.Navigate(typeof(Views.PlanificateurPage));
                     break;
+                case "WingetPage":
+                    ContentFrame.Navigate(typeof(Views.WingetPage));
+                    break;
                 case "GhostServicesPage":
                     ContentFrame.Navigate(typeof(Views.GhostServicesPage));
                     break;

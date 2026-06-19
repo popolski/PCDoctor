@@ -60,6 +60,7 @@
                         <NavigationViewItem Content="Mises à jour Windows" Tag="UpdatesPage"/>
                         <NavigationViewItem Content="Pilotes" Tag="DriversPage"/>
                         <NavigationViewItem Content="Planificateur" Tag="PlanificateurPage"/>
+                        <NavigationViewItem Content="Paquets (Winget)" Tag="WingetPage"/>
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
 

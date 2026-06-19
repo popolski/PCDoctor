@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="PCDoctor.Views.WingetPage"
+    x:Name="PageRoot"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:PCDoctor.ViewModels">
+    <Page.DataContext>
+        <vm:WingetViewModel/>
+    </Page.DataContext>
+
+    <Grid Margin="40" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Titre -->
+        <TextBlock Grid.Row="0" Text="Mises à jour (Winget)" FontSize="32" FontWeight="SemiBold"/>
+
+        <!-- Barre d'actions -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10">
+            <Button Content="Analyser"
+                    Command="{Binding ScanCommand}"
+                    Style="{StaticResource AccentButtonStyle}"
+                    IsEnabled="{Binding CanScan}"/>
+            <Button Content="Mettre à jour la sélection"
+                    Command="{Binding UpdateSelectedCommand}"
+                    IsEnabled="{Binding HasScanned}"/>
+            <Button Content="Tout mettre à jour"
+                    Command="{Binding UpdateAllCommand}"
+                    IsEnabled="{Binding HasScanned}"/>
+            <ProgressRing IsActive="{Binding IsScanning}" Width="24" Height="24" VerticalAlignment="Center"/>
+            <ProgressRing IsActive="{Binding IsUpdating}" Width="24" Height="24" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Liste des mises à jour -->
+        <ScrollViewer Grid.Row="2">
+            <ItemsControl ItemsSource="{Binding Updates}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                CornerRadius="8" Padding="14,10" Margin="0,0,0,6"
+                                BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="70"/>
+                                </Grid.ColumnDefinitions>
+
+                                <CheckBox Grid.Column="0"
+                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                          VerticalAlignment="Center"/>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding Id}" Opacity="0.55" FontSize="11" FontFamily="Consolas"/>
+                                </StackPanel>
+
+                                <TextBlock Grid.Column="2" Text="{Binding Version}"
+                                           Opacity="0.65" FontSize="12" VerticalAlignment="Center"/>
+
+                                <Border Grid.Column="3" CornerRadius="4" Padding="8,3"
+                                        Background="{ThemeResource SystemFillColorSuccessBackgroundBrush}"
+                                        VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    <TextBlock Text="{Binding Available}" FontSize="12" FontWeight="SemiBold"/>
+                                </Border>
+
+                                <TextBlock Grid.Column="5" Text="{Binding Source}"
+                                           Opacity="0.45" FontSize="11" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Journal live -->
+        <Expander Grid.Row="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <Expander.Header>
+                <TextBlock Text="Journal de mise à jour" FontWeight="SemiBold"/>
+            </Expander.Header>
+            <ScrollViewer MaxHeight="180" Margin="0,8,0,0" VerticalScrollBarVisibility="Auto">
+                <TextBlock Text="{Binding LogText}"
+                           FontFamily="Consolas" FontSize="11"
+                           TextWrapping="Wrap" Opacity="0.85"/>
+            </ScrollViewer>
+        </Expander>
+
+        <!-- Statut -->
+        <TextBlock Grid.Row="4" Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic"/>
+    </Grid>
+</Page>
