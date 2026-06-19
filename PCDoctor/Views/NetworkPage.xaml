@@ -40,6 +40,46 @@
                 </Grid>
             </Border>
 
+            <!-- Serveur DNS -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Serveur DNS" FontWeight="SemiBold" FontSize="16"/>
+                    <TextBlock Opacity="0.7" TextWrapping="Wrap" FontSize="12">
+                        Appliqué sur toutes les interfaces réseau actives. Cloudflare et Quad9 offrent rapidité et confidentialité. Automatique = serveur de votre FAI/box.
+                    </TextBlock>
+                    <ComboBox ItemsSource="{Binding DnsPresets}"
+                              SelectedItem="{Binding SelectedDnsPreset, Mode=TwoWay}"
+                              MinWidth="260"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Actions réseau -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Actions réseau" FontWeight="SemiBold" FontSize="16"/>
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <Button Content="Vider le cache DNS" Command="{Binding FlushDnsCommand}" HorizontalAlignment="Stretch"/>
+                            <TextBlock Opacity="0.65" FontSize="11" TextWrapping="Wrap">
+                                Efface le cache DNS local. Utile après un changement de serveur DNS ou en cas de résolution incorrecte.
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="6">
+                            <Button Content="Réinitialiser Winsock" Command="{Binding ResetWinsockCommand}" HorizontalAlignment="Stretch"/>
+                            <TextBlock Opacity="0.65" FontSize="11" TextWrapping="Wrap">
+                                Remet le catalogue Winsock à l'état par défaut. Redémarrage requis. Utile en cas de perte de connectivité inexpliquée.
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
             <TextBlock Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic" Margin="0,8,0,0"/>
         </StackPanel>
     </ScrollViewer>

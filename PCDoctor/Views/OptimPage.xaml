@@ -12,17 +12,61 @@
             <TextBlock Text="Optimisations" FontSize="32" FontWeight="SemiBold"/>
             <TextBlock Text="ON = fonctionnalité active." Opacity="0.7"/>
 
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+            <!-- Hibernation -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Margin="0,0,16,0">
                         <TextBlock Text="Hibernation" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Mode hibernation. OFF = désactivé (libère plusieurs Go via hiberfil.sys)." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
                     <ToggleSwitch Grid.Column="1" IsOn="{Binding HibernationActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Fast Startup -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Démarrage rapide (Fast Startup)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">
+                            Hybride entre arrêt et hibernation. OFF = arrêt complet à chaque extinction (recommandé pour la stabilité et les MAJ).
+                        </TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding FastStartupActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Power Throttling -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Désactiver Power Throttling" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">
+                            Windows peut brider le CPU de certains processus pour économiser de l'énergie. ON = bridage désactivé (meilleures performances, surtout sur laptop).
+                        </TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding PowerThrottlingDisabled, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Compression mémoire -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Compression mémoire" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">
+                            Windows compresse les pages mémoire inactives pour éviter le recours au fichier de swap. ON recommandé si RAM limitée ; OFF si RAM abondante (réduit la charge CPU).
+                        </TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding MemoryCompressionActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
                 </Grid>
             </Border>
 
