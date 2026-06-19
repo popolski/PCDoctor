@@ -157,6 +157,28 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            <!-- Rapport HTML -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="Rapport HTML complet" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" FontSize="12" TextWrapping="Wrap">
+                            Génère un rapport HTML sur le Bureau avec l'état de toutes les fonctionnalités : optimisations, confidentialité, hardening, gaming...
+                        </TextBlock>
+                        <TextBlock Text="{Binding ReportStatus}" Opacity="0.7" FontStyle="Italic" FontSize="12"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
+                        <Button Content="Générer le rapport"
+                                Command="{Binding GenerateReportCommand}"
+                                IsEnabled="{Binding CanGenerateReport}"
+                                Style="{StaticResource AccentButtonStyle}"/>
+                        <ProgressBar IsIndeterminate="{Binding IsGeneratingReport}" Width="160"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
         </StackPanel>
     </ScrollViewer>
 </Page>

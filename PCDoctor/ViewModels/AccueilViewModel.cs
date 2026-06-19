@@ -1,15 +1,19 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PCDoctor.Services;
 
 namespace PCDoctor.ViewModels
 {
     public partial class AccueilViewModel : ObservableObject
     {
-        private readonly SystemInfoService _sysInfo = new();
-        private readonly HealthService     _health  = new();
+        private readonly SystemInfoService _sysInfo  = new();
+        private readonly HealthService     _health   = new();
+        private readonly ReportService     _report   = new();
 
         [ObservableProperty] private string osName = "";
         [ObservableProperty] private string machineName = "";
@@ -19,6 +23,30 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private string defenderText = "";
         [ObservableProperty] private bool defenderOk;
         [ObservableProperty] private string uptimeText = "";
+
+        // Rapport
+        [ObservableProperty] private bool isGeneratingReport;
+        [ObservableProperty] private string reportStatus = "";
+        public bool CanGenerateReport => !IsGeneratingReport;
+        partial void OnIsGeneratingReportChanged(bool v) => OnPropertyChanged(nameof(CanGenerateReport));
+
+        [RelayCommand]
+        private async Task GenerateReport()
+        {
+            IsGeneratingReport = true;
+            ReportStatus = "Génération du rapport...";
+            try
+            {
+                string path = await Task.Run(() => _report.Generate());
+                ReportStatus = $"Rapport créé sur le Bureau.";
+                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            }
+            catch (Exception e)
+            {
+                ReportStatus = $"Erreur : {e.Message}";
+            }
+            finally { IsGeneratingReport = false; }
+        }
 
         // Score de santé
         [ObservableProperty] private int scoreOk;
