@@ -76,6 +76,9 @@ namespace PCDoctor
                 case "EtatPage":
                     ContentFrame.Navigate(typeof(Views.EtatPage));
                     break;
+                case "GamingPage":
+                    ContentFrame.Navigate(typeof(Views.GamingPage));
+                    break;
                 case "AProposPage":
                     ContentFrame.Navigate(typeof(Views.SettingsPage));
                     break;
