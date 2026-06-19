@@ -54,6 +54,36 @@
                 </Grid>
             </Border>
 
+            <!-- mDNS / Bonjour -->
+            <TextBlock Text="Protocoles réseau" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="mDNS Windows (résolution locale)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Résolution de noms sur le réseau local sans DNS central. OFF = réduit la surface d'attaque sur les réseaux non fiables. Redémarrage recommandé.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding MdnsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="4">
+                        <TextBlock Text="Bonjour Apple (mDNSResponder)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Service Apple installé avec iTunes/iCloud. Écoute en permanence sur le réseau. Désactivation recommandée si inutilisé.</TextBlock>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Désactiver"
+                            Command="{Binding DisableBonjourCommand}"
+                            IsEnabled="{Binding BonjourInstalled}"
+                            VerticalAlignment="Center" Margin="16,0,0,0"/>
+                </Grid>
+            </Border>
+
             <!-- Defender -->
             <TextBlock Text="Windows Defender" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
 

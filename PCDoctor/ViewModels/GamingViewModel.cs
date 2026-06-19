@@ -14,6 +14,7 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool gameBarActive;
         [ObservableProperty] private bool gpuPriorityActive;
         [ObservableProperty] private bool mouseAccelActive;
+        [ObservableProperty] private bool nagleDisabled;
         [ObservableProperty] private string statusText = "";
 
         public GamingViewModel() { Sync(); }
@@ -27,6 +28,7 @@ namespace PCDoctor.ViewModels
             GameBarActive     = _svc.IsGameBarActive();
             GpuPriorityActive = _svc.IsGpuPriorityActive();
             MouseAccelActive  = _svc.IsMouseAccelActive();
+            NagleDisabled     = _svc.IsNagleDisabled();
             _loading = false;
         }
 
@@ -67,6 +69,12 @@ namespace PCDoctor.ViewModels
             if (_loading) return;
             _svc.SetMouseAccel(v);
             StatusText = v ? "Acceleration souris activee" : "Acceleration souris desactivee (visee directe)";
+        }
+        partial void OnNagleDisabledChanged(bool v)
+        {
+            if (_loading) return;
+            _svc.SetNagle(v);
+            StatusText = v ? "Algorithme de Nagle desactive - latence TCP reduite" : "Algorithme de Nagle reactivé (defaut Windows)";
         }
     }
 }

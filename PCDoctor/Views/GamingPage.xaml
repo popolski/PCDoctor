@@ -108,6 +108,21 @@
                 </Grid>
             </Border>
 
+            <!-- Nagle -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Désactiver l'algorithme de Nagle (TCP)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = Nagle desactive (TcpAckFrequency=1, TCPNoDelay=1) : envoie chaque paquet immediatement, reduit la latence reseau en jeu. OFF = comportement TCP standard.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding NagleDisabled, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
             <TextBlock Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic" Margin="0,8,0,0"/>
         </StackPanel>
     </ScrollViewer>

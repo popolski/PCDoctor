@@ -48,6 +48,56 @@ namespace PCDoctor.Services
             p!.WaitForExit();
         }
 
+        // ─── mDNS / Bonjour ───
+        // mDNS Windows integre : HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters\EnableMDNS
+        // 0 = desactive, 1 (ou absent) = actif
+        // Bonjour Apple : service "Bonjour Service" (mDNSResponder)
+        public bool IsMdnsActive()
+        {
+            var v = RegistryHelper.GetDword(@"SYSTEM\CurrentControlSet\Services\Dnscache\Parameters", "EnableMDNS");
+            return v != 0; // absent ou 1 = actif
+        }
+        public bool IsBonjourInstalled()
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("sc.exe", "query \"Bonjour Service\"")
+                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
+                using var p = Process.Start(psi)!;
+                string o = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+                return o.Contains("Bonjour", StringComparison.OrdinalIgnoreCase);
+            }
+            catch { return false; }
+        }
+        public void SetMdns(bool active)
+        {
+            if (active)
+                RegistryHelper.DeleteValueHklm(@"SYSTEM\CurrentControlSet\Services\Dnscache\Parameters", "EnableMDNS");
+            else
+                RegistryHelper.SetDwordHklm(@"SYSTEM\CurrentControlSet\Services\Dnscache\Parameters", "EnableMDNS", 0);
+            Logger.Action($"mDNS Windows {(active ? "reactivé" : "desactive")}");
+        }
+        public string DisableBonjour()
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("sc.exe", "stop \"Bonjour Service\"")
+                { UseShellExecute = false, CreateNoWindow = true };
+                using var p1 = Process.Start(psi)!;
+                p1.WaitForExit();
+
+                var psi2 = new ProcessStartInfo("sc.exe", "config \"Bonjour Service\" start= disabled")
+                { UseShellExecute = false, CreateNoWindow = true };
+                using var p2 = Process.Start(psi2)!;
+                p2.WaitForExit();
+
+                Logger.Action("Service Bonjour desactive");
+                return "Service Bonjour desactive (arrete et demarrage mis a Desactive).";
+            }
+            catch (Exception e) { return $"Erreur : {e.Message}"; }
+        }
+
         // ─── Defender : informations signatures ───
         public (string version, string date) GetDefenderSignatureInfo()
         {

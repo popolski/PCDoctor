@@ -136,6 +136,67 @@ namespace PCDoctor.Services
             catch { }
         }
 
+        // ─── Algorithme de Nagle (TCP) ───
+        // TcpAckFrequency=1 + TCPNoDelay=1 -> Nagle desactive (latence reduite)
+        // Ces valeurs sont sous HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\{guid}
+        // On les applique sur toutes les interfaces IPv4 actives.
+        public bool IsNagleDisabled()
+        {
+            try
+            {
+                using var interfaces = Registry.LocalMachine.OpenSubKey(
+                    @"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces");
+                if (interfaces == null) return false;
+                foreach (var name in interfaces.GetSubKeyNames())
+                {
+                    using var iface = interfaces.OpenSubKey(name);
+                    if (iface?.GetValue("DhcpIPAddress") == null && iface?.GetValue("IPAddress") == null)
+                        continue;
+                    var freq  = iface?.GetValue("TcpAckFrequency");
+                    var delay = iface?.GetValue("TCPNoDelay");
+                    if (freq is int f && delay is int d && f == 1 && d == 1)
+                        return true;
+                }
+                return false;
+            }
+            catch { return false; }
+        }
+        public void SetNagle(bool disableNagle)
+        {
+            try
+            {
+                // Cle globale
+                using var global = Registry.LocalMachine.CreateSubKey(
+                    @"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters");
+                global.SetValue("TCPNoDelay", disableNagle ? 1 : 0, RegistryValueKind.DWord);
+
+                // Toutes les interfaces
+                using var interfaces = Registry.LocalMachine.OpenSubKey(
+                    @"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces");
+                if (interfaces != null)
+                {
+                    foreach (var name in interfaces.GetSubKeyNames())
+                    {
+                        using var iface = Registry.LocalMachine.OpenSubKey(
+                            $@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\{name}", writable: true);
+                        if (iface == null) continue;
+                        if (disableNagle)
+                        {
+                            iface.SetValue("TcpAckFrequency", 1, RegistryValueKind.DWord);
+                            iface.SetValue("TCPNoDelay",      1, RegistryValueKind.DWord);
+                        }
+                        else
+                        {
+                            iface.DeleteValue("TcpAckFrequency", throwOnMissingValue: false);
+                            iface.DeleteValue("TCPNoDelay",      throwOnMissingValue: false);
+                        }
+                    }
+                }
+                Logger.Action($"Algorithme Nagle : {(disableNagle ? "desactive" : "reactivé")}");
+            }
+            catch (Exception e) { Logger.Warn($"SetNagle : {e.Message}"); }
+        }
+
         // ─── Helpers ───
         private static int? GetDwordHkcu(string keyPath, string valueName)
         {

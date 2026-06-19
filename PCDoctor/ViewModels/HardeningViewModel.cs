@@ -15,6 +15,8 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool puaActive;
         [ObservableProperty] private string statusText = "";
         [ObservableProperty] private string signatureInfo = "Chargement...";
+        [ObservableProperty] private bool mdnsActive;
+        [ObservableProperty] private bool bonjourInstalled;
         [ObservableProperty] private bool isDefenderBusy;
         public bool CanUseDefender => !IsDefenderBusy;
 
@@ -29,9 +31,11 @@ namespace PCDoctor.ViewModels
         private void Sync()
         {
             _loading = true;
-            LlmnrActive = _svc.IsLlmnrActive();
-            Smb1Active  = _svc.IsSmb1Active();
-            PuaActive   = _svc.IsPuaActive();
+            LlmnrActive      = _svc.IsLlmnrActive();
+            Smb1Active       = _svc.IsSmb1Active();
+            PuaActive        = _svc.IsPuaActive();
+            MdnsActive       = _svc.IsMdnsActive();
+            BonjourInstalled = _svc.IsBonjourInstalled();
             _loading = false;
         }
 
@@ -39,6 +43,20 @@ namespace PCDoctor.ViewModels
         {
             var (ver, date) = await Task.Run(() => _svc.GetDefenderSignatureInfo());
             SignatureInfo = $"v{ver}  —  {date}";
+        }
+
+        partial void OnMdnsActiveChanged(bool v)
+        {
+            if (_loading) return;
+            _svc.SetMdns(v);
+            StatusText = v ? "mDNS reactivé" : "mDNS desactive - redemarrage recommande pour prendre effet";
+        }
+
+        [RelayCommand]
+        private void DisableBonjour()
+        {
+            StatusText = _svc.DisableBonjour();
+            BonjourInstalled = _svc.IsBonjourInstalled();
         }
 
         [RelayCommand]
