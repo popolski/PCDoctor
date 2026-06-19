@@ -11,6 +11,13 @@ namespace PCDoctor
             this.InitializeComponent();
         }
 
+        // Applique un thème à toute la fenêtre (menu inclus)
+        public void ApplyTheme(ElementTheme theme)
+        {
+            if (this.Content is FrameworkElement root)
+                root.RequestedTheme = theme;
+        }
+
         // Au chargement : sélectionner "Accueil" par défaut
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {

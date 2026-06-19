@@ -31,9 +31,9 @@ namespace PCDoctor.Views
                 : "⚠️ Droits administrateur absents : certaines actions système échoueront.";
 
             // Thème courant
-            if (App.MainWindowRef?.Content is FrameworkElement root)
+            if (App.MainWindowRef is MainWindow mw && mw.Content is FrameworkElement fe)
             {
-                ThemeCombo.SelectedIndex = root.RequestedTheme switch
+                ThemeCombo.SelectedIndex = fe.RequestedTheme switch
                 {
                     ElementTheme.Light => 1,
                     ElementTheme.Dark => 2,
@@ -46,15 +46,14 @@ namespace PCDoctor.Views
         private void ThemeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!_initialized) return;
-            if (App.MainWindowRef?.Content is FrameworkElement root)
+            var theme = ThemeCombo.SelectedIndex switch
             {
-                root.RequestedTheme = ThemeCombo.SelectedIndex switch
-                {
-                    1 => ElementTheme.Light,
-                    2 => ElementTheme.Dark,
-                    _ => ElementTheme.Default
-                };
-            }
+                1 => ElementTheme.Light,
+                2 => ElementTheme.Dark,
+                _ => ElementTheme.Default
+            };
+            if (App.MainWindowRef is MainWindow mw)
+                mw.ApplyTheme(theme);
         }
 
         private void OpenLogs_Click(object sender, RoutedEventArgs e)
