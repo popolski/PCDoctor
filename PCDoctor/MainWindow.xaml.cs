@@ -43,6 +43,9 @@ namespace PCDoctor
 
             switch (pageTag)
             {
+                case "ProfilesPage":
+                    ContentFrame.Navigate(typeof(Views.ProfilesPage));
+                    break;
                 case "AccueilPage":
                     ContentFrame.Navigate(typeof(Views.AccueilPage));
                     break;

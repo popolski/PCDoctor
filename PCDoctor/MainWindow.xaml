@@ -26,6 +26,12 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
+                <NavigationViewItem Content="Profils &amp; Plans" Tag="ProfilesPage">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE728;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
                 <NavigationViewItemSeparator/>
 
                 <NavigationViewItem Content="Diagnostic" Icon="Find">
