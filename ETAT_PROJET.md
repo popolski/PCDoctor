@@ -1,7 +1,7 @@
 # ETAT_PROJET.md — PCDoctor (édition C# / WinUI 3)
 
 > Fichier de passation pour reprendre le développement dans Claude Code.
-> Dernière mise à jour : v3.0 fonctionnelle — 18 pages, exe publié OK.
+> Dernière mise à jour : v3.0 — 22 pages, couverture proche de WinUtil/Chris Titus.
 
 ---
 
@@ -33,7 +33,9 @@ IMPORTANT : ne jamais utiliser `System.Management` (WMI via COM) — le trimmer 
 - **Langue** : français, ton semi-formel.
 - **JAMAIS de tirets cadratins (—)** dans le code, les commentaires ou les textes. Utiliser des tirets simples (-).
 - **Attention à l'encodage** : éviter les caractères Unicode spéciaux (─, etc.) dans les fichiers .cs.
-- **Pas de BoolToVisibilityConverter** : ce projet n'a aucun converter. Gérer la visibilité autrement (string vide, propriété dédiée IsXxxVisible ignorée, ou logique dans le ViewModel).
+- **Pas de BoolToVisibilityConverter** : ce projet n'a aucun converter. Gérer la visibilité via une propriété bool dédiée (`CanRun`, `IsXxxVisible`) ou un string vide.
+- **Pas de ternaire string dans x:Bind** : `{x:Bind IsOk ? "A" : "B"}` plante le parser XAML. Mettre la propriété calculée directement sur le modèle (ex. `public string Icon => IsOk ? "✅" : "⚠️"`).
+- **record C# dans DataTemplate x:DataType** : le générateur XAML essaie d'assigner les propriétés init-only -> utiliser une class normale avec getters en lecture seule.
 - L'utilisateur **pilote les décisions** ; l'assistant écrit le code.
 - **Toujours valider chaque page** (build + test visuel) avant de passer à la suivante.
 - **Commit Git** après chaque page validée.
@@ -55,10 +57,11 @@ PCDoctor/
 
 **Navigation** : `NavView_SelectionChanged` lit le `Tag` de l'item et fait `ContentFrame.Navigate(typeof(Views.XxxPage))` via un switch. L'engrenage natif (`IsSettingsVisible="True"`) donne `pageTag = "AProposPage"` -> SettingsPage.
 
-**Menu actuel (6 categories) :**
+**Menu actuel (7 sections) :**
 - Accueil
+- Profils & Plans *(juste sous Accueil, icone engrenage)*
 - Diagnostic : Audits, Etat systeme, Applications, Demarrage
-- Optimisation : Nettoyage, Optimisations, Gaming, Bloatware, Services fantomes
+- Optimisation : Nettoyage, Optimisations, Gaming, Bloatware, Services fantomes, Explorateur Windows
 - Securite & Vie privee : Hardening, Confidentialite, Reseau
 - Maintenance : MAJ Windows, Pilotes, Planificateur, Paquets (Winget), Outils systeme
 - (engrenage) Parametres + A propos
@@ -81,6 +84,9 @@ PCDoctor/
 - **WMI + Task.Run = STA/MTA** : `System.Management.ManagementObjectSearcher` utilise COM (STA), `Task.Run` utilise MTA -> exception silencieuse, liste vide. FIX : utiliser PowerShell+JSON.
 - **Win32_PnPSignedDriver** : ne supporte pas SELECT avec colonnes nommees -> utiliser `SELECT *`.
 - **Winget output** : le spinner d'attente et le tableau sont sur la MEME ligne `\n` separee par des `\r`. Parser : split sur `\r`, prendre le dernier segment non-vide. Split sur `\s{2+}` insuffisant (colonnes peuvent etre separees par 1 seul espace) -> utiliser les positions d'index de l'en-tete.
+- **Negation bool en XAML** : pas de converter. Utiliser une propriete `CanXxx => !IsXxx` + `partial void OnIsXxxChanged(bool v) => OnPropertyChanged(nameof(CanXxx))`.
+- **ComboBox SelectedItem** : binder `SelectedItem="{Binding SelectedXxx, Mode=TwoWay}"` sur une `ObservableCollection<string>`. Mettre un flag `_loading` pour ne pas declencher l'action au chargement initial.
+- **Sélecteur DNS / Plan alimentation** : meme pattern ComboBox. Les presets sont des tableaux statiques dans le Service (`NetworkService.DnsPresets`, `ProfilesService.PowerPlans`).
 
 ---
 
@@ -101,28 +107,30 @@ PCDoctor/
 
 ---
 
-## 6. PAGES FAITES (18 fonctionnelles)
+## 6. PAGES FAITES (22 fonctionnelles)
 
-| Page | Service | Contenu |
-|------|---------|---------|
-| **Accueil** | SystemInfoService | Dashboard : OS, RAM, Defender, Uptime, Disques |
+| Page | Service(s) | Contenu |
+|------|-----------|---------|
+| **Accueil** | SystemInfoService, HealthService | Dashboard (OS, RAM, Defender, Uptime, Disques) + score de sante (11 verifications async, icones OK/Warning) |
+| **Profils & Plans** | ProfilesService | Selecteur plan alimentation (Eco/Equilibre/HP/Ultimate) + 4 profils rapides : Gaming, Vie privee, Productivite, Equilibre |
 | **Audits** | AuditService | DataGrid : Services tiers, Drivers, Defender, Infos systeme (PowerShell+JSON) |
-| **Hardening** | HardeningService | 3 toggles : LLMNR, SMBv1 (DISM), PUA/SmartScreen |
-| **Confidentialite** | PrivacyService | 6 toggles : Telemetrie, Cortana, Activity History, Pubs, Ad ID, Office |
-| **Nettoyage** | CleanupService | Scan Temp/miniatures/corbeille -> cases -> confirmation -> clean |
-| **Reseau** | NetworkService | 2 toggles : IPv6, DoH Cloudflare |
-| **Optimisations** | OptimService | Hibernation toggle |
-| **Demarrage** | StartupService | Entrees registre Run ; desactiver = deplacer vers Run-PCDoctorDisabled (reversible) |
-| **Bloatware** | BloatwareService | Scan Appx -> cases -> desinstall + section "Nettoyage complementaire" : suppression OneDrive (kill+setup /uninstall+dossiers+CLSID) et blocage raccourcis Edge (policy EdgeUpdate) |
-| **Applications** | AppsService + ResidusService | Liste programmes (registre), recherche, desinstall natif + Expander "Residus" (dossiers+registre, SafetyGuard) |
 | **Etat systeme** | MonitorService | Monitoring temps reel (DispatcherTimer 2s) : CPU, RAM, top process, details hardware |
-| **Gaming** | GamingService | 6 toggles : Plan HP/Ultimate, Game Mode, HAGS (avert. redemarrage), Xbox Game Bar, Win32PrioritySeparation, acceleration souris |
-| **Services fantomes** | GhostServicesService | Scan services avec binaire absent (PowerShell+JSON) ; 5 niveaux SafetyGuard ; cases non cochees par defaut ; suppression via sc.exe delete |
-| **MAJ Windows** | UpdatesService | Derniere MAJ, reboot pending, comptage via WUA COM, liens ms-settings |
-| **Pilotes** | DriversService | Scan Win32_PnPSignedDriver (PowerShell+JSON), filtre > 3 ans, ouverture gestionnaire/WU optionnel |
+| **Applications** | AppsService + ResidusService | Liste programmes (registre), recherche, desinstall natif + Expander Residus (SafetyGuard) |
+| **Demarrage** | StartupService | Entrees registre Run ; desactiver = deplacer vers Run-PCDoctorDisabled (reversible) |
+| **Nettoyage** | CleanupService | Scan Temp/miniatures/corbeille -> cases -> confirmation -> clean |
+| **Optimisations** | OptimService | 8 toggles : Hibernation, Fast Startup, Power Throttling, Compression memoire, UTC clock, SysMain, Search Indexing, WER |
+| **Gaming** | GamingService | 7 toggles : Plan HP/Ultimate, Game Mode, HAGS, Xbox Game Bar, Win32PrioritySeparation, acceleration souris, Nagle (TCP) |
+| **Bloatware** | BloatwareService | Scan Appx -> cases -> desinstall + OneDrive (kill+uninstall+CLSID) + Edge shortcuts (policy) |
+| **Services fantomes** | GhostServicesService | Scan services avec binaire absent ; 5 niveaux SafetyGuard ; suppression via sc.exe delete |
+| **Explorateur Windows** | ExplorerService | 7 toggles : extensions, fichiers caches, fichiers systeme, chemin complet, vignettes, Fin de tache (Win11), NumLock + bouton Redemarrer Explorer |
+| **Hardening** | HardeningService | 3 toggles (LLMNR, SMBv1, PUA) + section Protocoles reseau (mDNS toggle, Bonjour desactivation) + section Defender (version signatures, MAJ, scan rapide) |
+| **Confidentialite** | PrivacyService | 13 toggles : Telemetrie, Cortana, Activity History, Pubs, Ad ID, Office, Wi-Fi Sense, Apps arriere-plan, Recall, Localisation, Copilot, Suggestions IA, Suggestions Parametres |
+| **Reseau** | NetworkService | 2 toggles (IPv6, DoH Cloudflare) + selecteur DNS (Automatique/Cloudflare/Google/Quad9/OpenDNS) + Flush DNS + Reset Winsock |
+| **MAJ Windows** | UpdatesService | Derniere MAJ, reboot pending, liens ms-settings |
+| **Pilotes** | DriversService | Scan Win32_PnPSignedDriver (PowerShell+JSON), filtre > 3 ans |
 | **Planificateur** | PlanificateurService | Taches non-Microsoft, activer/desactiver/supprimer, confirmation event |
-| **Paquets (Winget)** | WingetService | Analyse MAJ disponibles (parser colonne-fixe + StripCarriageReturns), update selectif ou global avec stdout live (DispatcherQueue) |
-| **Outils systeme** | SystemToolsService | SFC /scannow, DISM /restorehealth, point de restauration ; feedback live, boutons bloques pendant execution |
+| **Paquets (Winget)** | WingetService | Analyse MAJ disponibles (parser colonne-fixe + StripCarriageReturns), update selectif ou global avec stdout live |
+| **Outils systeme** | SystemToolsService | SFC /scannow, DISM /restorehealth, point de restauration ; feedback live |
 | **Parametres** | (code-behind) | Theme clair/sombre persistent (AppData\PCDoctor\theme.txt), logs, statut admin |
 
 ---
@@ -140,30 +148,22 @@ PCDoctor/
 
 ---
 
-## 8. LACUNES PAR RAPPORT AU PS1 ORIGINAL (basses priorites)
+## 8. CE QUI RESTE (effort moyen/eleve)
 
-Ces fonctions existent dans `F:\Backup_Profil\PCDoctor.ps1` mais n'ont pas ete portees (jugees mineures ou hors perimetre) :
-
-| Fonctionnalite | Categorie | Effort |
-|---|---|---|
-| Flush DNS, Reset Winsock | Reseau | Faible |
-| Desactivation Power Throttling | Gaming/Optim | Faible |
-| Desactivation Fast Startup | Optim | Faible |
-| Compression memoire toggle | Optim | Faible |
-| Algorithme Nagle (TCP) | Reseau/Gaming | Faible |
-| Scan Defender, MAJ signatures | Hardening | Faible |
-| BitLocker check, ASR Rules, Exploit Protection | Hardening avance | Moyen |
-| Suppression Bonjour/mDNS | Hardening | Tres faible |
-| Copilot/AI Features | Confidentialite | Faible |
-| Shell extensions, extensions navigateurs, grands fichiers | Audits | Moyen |
-| Profils rapides (Quick Actions), rapport HTML, journal undo | Accueil/Avance | Eleve |
+| Fonctionnalite | Categorie | Effort | Notes |
+|---|---|---|---|
+| BitLocker status + ASR Rules + Exploit Protection | Hardening avance | Moyen | Lecture PowerShell Get-BitLockerVolume, Set-ProcessMitigation |
+| Shell extensions / grandes fichiers / extensions navigateurs | Audits | Moyen | Nouvelles colonnes dans la page Audits |
+| Verbose login (messages de statut au boot) | Optimisations | Tres faible | HKLM\...\System\VerboseStatus = 1 |
+| Rapport HTML exportable | Accueil | Eleve | Template HTML + log des etat courants |
+| Journal undo (annuler une action) | Avance | Eleve | Historique inverse des modifications |
 
 ---
 
 ## 9. BUGS RESOLUS (ne pas refaire ces erreurs)
 
 - **Acces HKLM refuse** : resolu en passant l'app en non-packagé (section 1).
-- **Thème sombre menu restait blanc** : `<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">` + `ApplyTheme` sur `this.Content as FrameworkElement`.
+- **Theme sombre menu restait blanc** : `<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">` + `ApplyTheme` sur `this.Content as FrameworkElement`.
 - **Proprietes ObservableProperty absentes** : faire un Rebuild (pas juste Build).
 - **DataGrid en-tetes** : binding casse -> en-tetes en dur.
 - **WMI vide (STA/MTA)** : ManagementObjectSearcher dans Task.Run = exception silencieuse. FIX : PowerShell+JSON.
@@ -172,6 +172,9 @@ Ces fonctions existent dans `F:\Backup_Profil\PCDoctor.ps1` mais n'ont pas ete p
 - **Winget parser** : le spinner d'animation et le tableau partagent la meme ligne `\n` via `\r`. `StripCarriageReturns` : split sur `\r`, dernier segment non-vide. Colonnes a 1 seul espace -> parser par index depuis l'en-tete, pas par `\s{2+}`.
 - **BoolToVisibilityConverter** : pas de converter dans ce projet. Utiliser des proprietes string ou bool dediees.
 - **ContentDialog CS4036** : `using System;` manquant dans le code-behind -> `IAsyncOperation.GetAwaiter()` introuvable.
+- **Ternaire string dans x:Bind** : `{x:Bind IsOk ? "A" : "B"}` plante le parser XAML (quote characters). Mettre la propriete calculee sur le modele.
+- **record C# avec x:DataType** : le generateur XamlTypeInfo.g.cs essaie d'assigner les proprietes init-only -> utiliser class avec getters { get; } en lecture seule.
+- **RegistryHelper.SetDword inexistant** : la methode s'appelle `SetDwordHklm` (pas `SetDword`).
 
 ---
 
@@ -181,4 +184,4 @@ Ces fonctions existent dans `F:\Backup_Profil\PCDoctor.ps1` mais n'ont pas ete p
 2. `dotnet build PCDoctor/PCDoctor.csproj -c Debug -r win-x64` pour verifier.
 3. L'utilisateur lance l'app (Visual Studio F5 ou exe publish) pour le test visuel.
 4. Commit Git apres validation.
-5. Publication : `dotnet publish ... -r win-x64 --self-contained true -p:PublishSingleFile=true`
+5. Publication : `dotnet publish PCDoctor/PCDoctor.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true`
