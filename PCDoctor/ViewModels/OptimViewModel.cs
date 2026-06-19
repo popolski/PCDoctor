@@ -12,6 +12,7 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool fastStartupActive;
         [ObservableProperty] private bool powerThrottlingDisabled;
         [ObservableProperty] private bool memoryCompressionActive;
+        [ObservableProperty] private bool verboseStatusActive;
         [ObservableProperty] private bool utcClockActive;
         [ObservableProperty] private bool sysMainActive;
         [ObservableProperty] private bool searchIndexActive;
@@ -27,6 +28,7 @@ namespace PCDoctor.ViewModels
             FastStartupActive       = _svc.IsFastStartupActive();
             PowerThrottlingDisabled = _svc.IsPowerThrottlingDisabled();
             MemoryCompressionActive = _svc.IsMemoryCompressionActive();
+            VerboseStatusActive     = _svc.IsVerboseStatusActive();
             UtcClockActive          = _svc.IsUtcClockActive();
             SysMainActive           = _svc.IsSysMainActive();
             SearchIndexActive       = _svc.IsSearchIndexActive();
@@ -60,6 +62,13 @@ namespace PCDoctor.ViewModels
             if (_loading) return;
             _svc.SetMemoryCompression(v);
             StatusText = v ? "Compression mémoire activée" : "Compression mémoire désactivée";
+        }
+
+        partial void OnVerboseStatusActiveChanged(bool v)
+        {
+            if (_loading) return;
+            _svc.SetVerboseStatus(v);
+            StatusText = v ? "Messages détaillés au démarrage activés" : "Messages détaillés désactivés (démarrage silencieux)";
         }
 
         partial void OnUtcClockActiveChanged(bool v)

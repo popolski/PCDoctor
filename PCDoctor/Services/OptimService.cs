@@ -70,6 +70,25 @@ namespace PCDoctor.Services
             Logger.Action($"Compression mémoire {(active ? "activée" : "désactivée")}");
         }
 
+        // ── Messages de démarrage détaillés (Verbose Status) ─────────────────
+        // VerboseStatus = 1 -> affiche "Application des stratégies..." au boot/arrêt
+        public bool IsVerboseStatusActive()
+        {
+            var v = RegistryHelper.GetDword(
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System", "VerboseStatus");
+            return v == 1;
+        }
+        public void SetVerboseStatus(bool active)
+        {
+            if (active)
+                RegistryHelper.SetDwordHklm(
+                    @"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System", "VerboseStatus", 1);
+            else
+                RegistryHelper.DeleteValueHklm(
+                    @"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System", "VerboseStatus");
+            Logger.Action($"Verbose Status : {(active ? "actif" : "desactive")}");
+        }
+
         // ── Horloge UTC (dual-boot Linux) ────────────────────────────────────
         // RealTimeIsUniversal = 1 -> Windows stocke l'heure RTC en UTC (comme Linux)
         public bool IsUtcClockActive()
