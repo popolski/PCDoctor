@@ -12,6 +12,9 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool fastStartupActive;
         [ObservableProperty] private bool powerThrottlingDisabled;
         [ObservableProperty] private bool memoryCompressionActive;
+        [ObservableProperty] private bool sysMainActive;
+        [ObservableProperty] private bool searchIndexActive;
+        [ObservableProperty] private bool werActive;
         [ObservableProperty] private string statusText = "";
 
         public OptimViewModel() { Sync(); }
@@ -23,6 +26,9 @@ namespace PCDoctor.ViewModels
             FastStartupActive       = _svc.IsFastStartupActive();
             PowerThrottlingDisabled = _svc.IsPowerThrottlingDisabled();
             MemoryCompressionActive = _svc.IsMemoryCompressionActive();
+            SysMainActive           = _svc.IsSysMainActive();
+            SearchIndexActive       = _svc.IsSearchIndexActive();
+            WerActive               = _svc.IsWerActive();
             _loading = false;
         }
 
@@ -52,6 +58,27 @@ namespace PCDoctor.ViewModels
             if (_loading) return;
             _svc.SetMemoryCompression(v);
             StatusText = v ? "Compression mémoire activée" : "Compression mémoire désactivée";
+        }
+
+        partial void OnSysMainActiveChanged(bool v)
+        {
+            if (_loading) return;
+            _svc.SetSysMain(v);
+            StatusText = v ? "SysMain (Superfetch) activé" : "SysMain désactivé (conseillé sur SSD)";
+        }
+
+        partial void OnSearchIndexActiveChanged(bool v)
+        {
+            if (_loading) return;
+            _svc.SetSearchIndex(v);
+            StatusText = v ? "Indexation Windows Search activée" : "Indexation désactivée (conseillé sur HDD lent)";
+        }
+
+        partial void OnWerActiveChanged(bool v)
+        {
+            if (_loading) return;
+            _svc.SetWer(v);
+            StatusText = v ? "Windows Error Reporting activé" : "Windows Error Reporting désactivé";
         }
     }
 }

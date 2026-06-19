@@ -92,6 +92,49 @@ namespace PCDoctor.Services
             SetDwordHkcu(@"Software\Policies\Microsoft\Office\16.0\Common", "SendCustomerData", active ? 1 : 0);
         }
 
+        // ─── Windows Recall ───
+        // Recall stocke des screenshots permanents de l'ecran via IA (Win11 24H2+)
+        // HKCU\Software\Policies\Microsoft\Windows\WindowsAI\DisableAIDataAnalysis = 1 -> desactive
+        public bool IsRecallActive()
+        {
+            var v = GetDwordHkcu(@"Software\Policies\Microsoft\Windows\WindowsAI", "DisableAIDataAnalysis");
+            return v != 1; // 1 = desactive
+        }
+        public void SetRecall(bool active)
+        {
+            if (active)
+                SetDwordHkcu(@"Software\Policies\Microsoft\Windows\WindowsAI", "DisableAIDataAnalysis", 0);
+            else
+                SetDwordHkcu(@"Software\Policies\Microsoft\Windows\WindowsAI", "DisableAIDataAnalysis", 1);
+            Logger.Action($"Windows Recall {(active ? "reactivé" : "désactivé")}");
+        }
+
+        // ─── Localisation ───
+        public bool IsLocationActive()
+        {
+            var v = RegistryHelper.GetDword(@"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location", "Value");
+            // "Allow" = actif (string), on ne peut pas utiliser GetDword ici -> lecture directe
+            try
+            {
+                using var key = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location");
+                var val = key?.GetValue("Value") as string;
+                return val == null || val.Equals("Allow", StringComparison.OrdinalIgnoreCase);
+            }
+            catch { return true; }
+        }
+        public void SetLocation(bool active)
+        {
+            try
+            {
+                using var key = Registry.LocalMachine.CreateSubKey(
+                    @"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location");
+                key?.SetValue("Value", active ? "Allow" : "Deny");
+                Logger.Action($"Localisation {(active ? "activée" : "désactivée")}");
+            }
+            catch { }
+        }
+
         // ─── Copilot Windows ───
         // AllowCopilot = 0 via policy -> désactivé
         public bool IsCopilotActive()

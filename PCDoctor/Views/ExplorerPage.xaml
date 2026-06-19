@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="PCDoctor.Views.ExplorerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:PCDoctor.ViewModels">
+    <Page.DataContext>
+        <vm:ExplorerViewModel/>
+    </Page.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Margin="40" Spacing="16" MaxWidth="900" HorizontalAlignment="Left">
+            <TextBlock Text="Explorateur Windows" FontSize="32" FontWeight="SemiBold"/>
+            <TextBlock Opacity="0.7" TextWrapping="Wrap">
+                ON = fonctionnalité active. Cliquez "Redémarrer l'Explorateur" pour appliquer les changements sans redémarrer Windows.
+            </TextBlock>
+
+            <!-- Affichage -->
+            <TextBlock Text="Affichage" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+
+            <!-- Extensions -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Afficher les extensions de fichiers" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = vous voyez .exe, .docx, .jpg... Recommandé : évite les pièges (fichier.pdf.exe).</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding FileExtVisible, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Fichiers cachés -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Afficher les fichiers cachés" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = les dossiers/fichiers avec l'attribut "caché" sont visibles (AppData, ProgramData...)</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding HiddenVisible, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Fichiers système -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Afficher les fichiers système protégés" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = affiche pagefile.sys, hiberfil.sys, ntldr... Utile pour le diagnostic, à laisser OFF en usage normal.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SuperHiddenVisible, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Chemin complet -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Chemin complet dans la barre de titre" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = affiche C:\Users\...\Documents au lieu de "Documents" dans le titre de la fenêtre.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding FullPathInTitle, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Vignettes -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Désactiver les vignettes (icônes seules)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = icônes génériques uniquement, plus rapide sur disque dur lent. OFF = aperçu miniature des images/vidéos.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding IconsOnly, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Ergonomie -->
+            <TextBlock Text="Ergonomie" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+
+            <!-- Fin de tâche -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="&quot;Fin de tâche&quot; dans la barre des tâches (Win 11)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = clic droit sur une app dans la barre des tâches propose "Fin de tâche" directement, sans passer par le Gestionnaire des tâches.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding EndTaskEnabled, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- NumLock -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="NumLock activé au démarrage" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = le pavé numérique est actif dès l'écran de connexion Windows.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding NumLockOnBoot, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Bouton redémarrer explorateur -->
+            <Button Content="Redémarrer l'Explorateur Windows"
+                    Command="{Binding RestartExplorerCommand}"
+                    HorizontalAlignment="Left"/>
+
+            <TextBlock Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic" Margin="0,4,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

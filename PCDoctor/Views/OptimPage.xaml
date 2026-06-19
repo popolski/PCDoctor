@@ -70,6 +70,48 @@
                 </Grid>
             </Border>
 
+            <!-- Services système -->
+            <TextBlock Text="Services système" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+
+            <!-- SysMain -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="SysMain (Superfetch)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Précharge les apps fréquentes en RAM. OFF conseillé sur SSD (inutile et actif en arrière-plan). ON recommandé sur HDD.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SysMainActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- Search Index -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Indexation Windows Search" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Indexe vos fichiers pour accélérer la recherche. OFF = recherche plus lente mais réduit l'activité disque. Conseillé OFF sur HDD ancien.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SearchIndexActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
+            <!-- WER -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Windows Error Reporting" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Envoie des rapports de crash à Microsoft. OFF = aucun rapport envoyé, réduit légèrement l'activité après un crash.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding WerActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                </Grid>
+            </Border>
+
             <TextBlock Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic" Margin="0,8,0,0"/>
         </StackPanel>
     </ScrollViewer>

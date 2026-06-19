@@ -94,6 +94,9 @@ namespace PCDoctor
                 case "SystemToolsPage":
                     ContentFrame.Navigate(typeof(Views.SystemToolsPage));
                     break;
+                case "ExplorerPage":
+                    ContentFrame.Navigate(typeof(Views.ExplorerPage));
+                    break;
                 case "GhostServicesPage":
                     ContentFrame.Navigate(typeof(Views.GhostServicesPage));
                     break;

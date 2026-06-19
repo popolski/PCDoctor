@@ -70,6 +70,75 @@ namespace PCDoctor.Services
             Logger.Action($"Compression mémoire {(active ? "activée" : "désactivée")}");
         }
 
+        // ── SysMain (Superfetch) ──────────────────────────────────────────────
+        public bool IsSysMainActive()
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("powershell.exe",
+                    "-NoProfile -NonInteractive -Command \"(Get-Service SysMain).StartType\"")
+                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
+                using var p = Process.Start(psi)!;
+                var o = p.StandardOutput.ReadToEnd().Trim();
+                p.WaitForExit();
+                return !o.Equals("Disabled", StringComparison.OrdinalIgnoreCase);
+            }
+            catch { return true; }
+        }
+        public void SetSysMain(bool active)
+        {
+            string start = active ? "Automatic" : "Disabled";
+            string stop  = active ? "Start-Service SysMain -ErrorAction SilentlyContinue" : "Stop-Service SysMain -Force -ErrorAction SilentlyContinue";
+            RunPs($"Set-Service SysMain -StartupType {start}; {stop}");
+            Logger.Action($"SysMain : {(active ? "actif" : "désactivé")}");
+        }
+
+        // ── Windows Search Indexing ───────────────────────────────────────────
+        public bool IsSearchIndexActive()
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("powershell.exe",
+                    "-NoProfile -NonInteractive -Command \"(Get-Service WSearch).StartType\"")
+                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
+                using var p = Process.Start(psi)!;
+                var o = p.StandardOutput.ReadToEnd().Trim();
+                p.WaitForExit();
+                return !o.Equals("Disabled", StringComparison.OrdinalIgnoreCase);
+            }
+            catch { return true; }
+        }
+        public void SetSearchIndex(bool active)
+        {
+            string start = active ? "Automatic" : "Disabled";
+            string stop  = active ? "Start-Service WSearch -ErrorAction SilentlyContinue" : "Stop-Service WSearch -Force -ErrorAction SilentlyContinue";
+            RunPs($"Set-Service WSearch -StartupType {start}; {stop}");
+            Logger.Action($"Windows Search : {(active ? "actif" : "désactivé")}");
+        }
+
+        // ── Windows Error Reporting ───────────────────────────────────────────
+        public bool IsWerActive()
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("powershell.exe",
+                    "-NoProfile -NonInteractive -Command \"(Get-Service WerSvc).StartType\"")
+                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
+                using var p = Process.Start(psi)!;
+                var o = p.StandardOutput.ReadToEnd().Trim();
+                p.WaitForExit();
+                return !o.Equals("Disabled", StringComparison.OrdinalIgnoreCase);
+            }
+            catch { return true; }
+        }
+        public void SetWer(bool active)
+        {
+            string start = active ? "Manual" : "Disabled";
+            string stop  = active ? "" : "; Stop-Service WerSvc -Force -ErrorAction SilentlyContinue";
+            RunPs($"Set-Service WerSvc -StartupType {start}{stop}");
+            Logger.Action($"Windows Error Reporting : {(active ? "actif" : "désactivé")}");
+        }
+
         private void RunCmd(string cmd)
         {
             try

@@ -14,6 +14,8 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool adsActive;
         [ObservableProperty] private bool adIdActive;
         [ObservableProperty] private bool officeActive;
+        [ObservableProperty] private bool recallActive;
+        [ObservableProperty] private bool locationActive;
         [ObservableProperty] private bool copilotActive;
         [ObservableProperty] private bool aiSearchActive;
         [ObservableProperty] private bool settingsSuggestionsActive;
@@ -30,6 +32,8 @@ namespace PCDoctor.ViewModels
             AdsActive                  = _svc.IsAdsActive();
             AdIdActive                 = _svc.IsAdIdActive();
             OfficeActive               = _svc.IsOfficeActive();
+            RecallActive               = _svc.IsRecallActive();
+            LocationActive             = _svc.IsLocationActive();
             CopilotActive              = _svc.IsCopilotActive();
             AiSearchActive             = _svc.IsAiSearchActive();
             SettingsSuggestionsActive  = _svc.IsSettingsSuggestionsActive();
@@ -42,6 +46,8 @@ namespace PCDoctor.ViewModels
         partial void OnAdsActiveChanged(bool v)                 { if (_loading) return; _svc.SetAds(v);                  StatusText = v ? "Pubs réactivées" : "Pubs désactivées"; }
         partial void OnAdIdActiveChanged(bool v)                { if (_loading) return; _svc.SetAdId(v);                 StatusText = v ? "Advertising ID réactivé" : "Advertising ID désactivé"; }
         partial void OnOfficeActiveChanged(bool v)              { if (_loading) return; _svc.SetOffice(v);               StatusText = v ? "Télémétrie Office réactivée" : "Télémétrie Office désactivée"; }
+        partial void OnRecallActiveChanged(bool v)              { if (_loading) return; _svc.SetRecall(v);               StatusText = v ? "Windows Recall réactivé" : "Windows Recall désactivé (screenshots IA stoppés)"; }
+        partial void OnLocationActiveChanged(bool v)            { if (_loading) return; _svc.SetLocation(v);             StatusText = v ? "Localisation activée" : "Localisation désactivée"; }
         partial void OnCopilotActiveChanged(bool v)             { if (_loading) return; _svc.SetCopilot(v);              StatusText = v ? "Copilot réactivé" : "Copilot désactivé"; }
         partial void OnAiSearchActiveChanged(bool v)            { if (_loading) return; _svc.SetAiSearch(v);             StatusText = v ? "Suggestions IA activées" : "Suggestions IA dans la recherche désactivées"; }
         partial void OnSettingsSuggestionsActiveChanged(bool v) { if (_loading) return; _svc.SetSettingsSuggestions(v);  StatusText = v ? "Suggestions Paramètres activées" : "Suggestions dans les Paramètres désactivées"; }
