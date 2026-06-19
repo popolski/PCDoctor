@@ -9,16 +9,19 @@
         <vm:AppsViewModel/>
     </Page.DataContext>
 
-    <Grid Margin="40" RowSpacing="16">
+    <Grid Margin="40" RowSpacing="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Titre -->
         <TextBlock Grid.Row="0" Text="Applications installées" FontSize="32" FontWeight="SemiBold"/>
 
+        <!-- Recherche + actualiser -->
         <Grid Grid.Row="1" ColumnSpacing="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -26,9 +29,10 @@
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" PlaceholderText="Rechercher une application..."
                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Button Grid.Column="1" Content="🔄 Actualiser" Command="{Binding LoadCommand}"/>
+            <Button Grid.Column="1" Content="Actualiser" Command="{Binding LoadCommand}"/>
         </Grid>
 
+        <!-- Liste des apps -->
         <ScrollViewer Grid.Row="2">
             <ItemsControl ItemsSource="{Binding Apps}">
                 <ItemsControl.ItemTemplate>
@@ -43,7 +47,7 @@
                                 <StackPanel Grid.Column="0" Margin="0,0,16,0">
                                     <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
                                     <TextBlock Opacity="0.6" FontSize="12">
-                                        <Run Text="{Binding Publisher}"/><Run Text="  •  v"/><Run Text="{Binding Version}"/>
+                                        <Run Text="{Binding Publisher}"/><Run Text="  -  v"/><Run Text="{Binding Version}"/>
                                     </TextBlock>
                                 </StackPanel>
                                 <Button Grid.Column="1" Content="Désinstaller" VerticalAlignment="Center"
@@ -56,6 +60,81 @@
             </ItemsControl>
         </ScrollViewer>
 
+        <!-- Status apps -->
         <TextBlock Grid.Row="3" Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic"/>
+
+        <!-- Expander : Nettoyage de résidus -->
+        <Expander Grid.Row="4" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0,8,0,0">
+            <Expander.Header>
+                <TextBlock Text="Nettoyage de résidus" FontWeight="SemiBold" FontSize="16"/>
+            </Expander.Header>
+
+            <StackPanel Spacing="12" Margin="0,8,0,0">
+                <TextBlock Text="Recherche les dossiers et clés registre laissés après désinstallation. Jamais de suppression automatique."
+                           Opacity="0.7" TextWrapping="Wrap"/>
+
+                <!-- Barre de scan -->
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0"
+                             PlaceholderText="Nom d'application ou éditeur (ex : Firefox, Adobe...)"
+                             Text="{Binding ResidusSearchName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="1" Content="Scanner"
+                            Command="{Binding ScanResidusCommand}"
+                            Style="{StaticResource AccentButtonStyle}"/>
+                    <ProgressRing Grid.Column="2" IsActive="{Binding ResidusIsLoading}"
+                                  Width="24" Height="24" VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- Liste des résidus trouvés -->
+                <ScrollViewer MaxHeight="320">
+                    <ItemsControl ItemsSource="{Binding ResidusItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                        CornerRadius="6" Padding="12" Margin="0,0,0,6"
+                                        BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox Grid.Column="0"
+                                                  IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                  VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <Border Grid.Column="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0"
+                                                Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding TypeLabel}" FontSize="11"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="2" Text="{Binding Path}"
+                                                   TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding SizeStr}"
+                                                   Opacity="0.6" FontSize="11" VerticalAlignment="Center"
+                                                   Margin="12,0,0,0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Actions résidus -->
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Button Content="Supprimer la sélection"
+                            Command="{Binding CleanResidusCommand}"
+                            Style="{StaticResource AccentButtonStyle}"/>
+                </StackPanel>
+
+                <!-- Status résidus -->
+                <TextBlock Text="{Binding ResidusStatusText}" Opacity="0.8" FontStyle="Italic"/>
+            </StackPanel>
+        </Expander>
     </Grid>
 </Page>

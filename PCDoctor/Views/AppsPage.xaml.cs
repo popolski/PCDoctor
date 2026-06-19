@@ -11,19 +11,36 @@ namespace PCDoctor.Views
         {
             this.InitializeComponent();
             if (this.DataContext is AppsViewModel vm)
-                vm.ConfirmRequested += ShowConfirmDialog;
+            {
+                vm.ConfirmRequested        += ShowUninstallDialog;
+                vm.ResidusConfirmRequested += ShowResidusDialog;
+            }
         }
 
-        private async Task<bool> ShowConfirmDialog(string message)
+        private async Task<bool> ShowUninstallDialog(string message)
         {
             var dialog = new ContentDialog
             {
-                Title = "Confirmer la désinstallation",
-                Content = message,
+                Title             = "Confirmer la désinstallation",
+                Content           = message,
                 PrimaryButtonText = "Désinstaller",
-                CloseButtonText = "Annuler",
-                DefaultButton = ContentDialogButton.Close,
-                XamlRoot = this.XamlRoot
+                CloseButtonText   = "Annuler",
+                DefaultButton     = ContentDialogButton.Close,
+                XamlRoot          = this.XamlRoot
+            };
+            return (await dialog.ShowAsync()) == ContentDialogResult.Primary;
+        }
+
+        private async Task<bool> ShowResidusDialog(string message)
+        {
+            var dialog = new ContentDialog
+            {
+                Title             = "Confirmer la suppression des résidus",
+                Content           = message,
+                PrimaryButtonText = "Supprimer",
+                CloseButtonText   = "Annuler",
+                DefaultButton     = ContentDialogButton.Close,
+                XamlRoot          = this.XamlRoot
             };
             return (await dialog.ShowAsync()) == ContentDialogResult.Primary;
         }

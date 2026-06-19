@@ -43,5 +43,25 @@ namespace PCDoctor.Services
             if (string.IsNullOrWhiteSpace(path)) return false;
             return SafeLocationPatterns.Any(p => path.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0);
         }
+
+        // True si ce résidu est à ne jamais supprimer (anti-cheat, System32...).
+        // Moins strict que IsSafeLocation : ne bloque pas tout Program Files,
+        // seulement les emplacements vraiment dangereux.
+        public static bool IsProtectedResidu(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return false;
+            var dangerous = new[]
+            {
+                "Wellbia", "BattlEye", "EasyAntiCheat", "AntiCheat", "Uncheater",
+                "vgc", "vgk", "Vanguard", "nProtect", "FACEIT", "PunkBuster",
+                "mhyprot", "xigncode", "xhunter", "GameGuard"
+            };
+            if (dangerous.Any(d => path.IndexOf(d, StringComparison.OrdinalIgnoreCase) >= 0))
+                return true;
+            // Bloquer System32 et SysWOW64
+            var win = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            return path.StartsWith(System.IO.Path.Combine(win, "System32"), StringComparison.OrdinalIgnoreCase)
+                || path.StartsWith(System.IO.Path.Combine(win, "SysWOW64"), StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
