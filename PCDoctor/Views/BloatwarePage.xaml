@@ -15,6 +15,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="Bloatware Windows" FontSize="32" FontWeight="SemiBold"/>
@@ -49,5 +50,24 @@
         </ScrollViewer>
 
         <TextBlock Grid.Row="3" Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic"/>
+
+        <!-- Section : Nettoyage complémentaire -->
+        <Border Grid.Row="4"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                CornerRadius="8" Padding="20"
+                BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+            <StackPanel Spacing="12">
+                <TextBlock Text="Nettoyage complémentaire" FontWeight="SemiBold" FontSize="16"/>
+                <TextBlock Text="Actions destructrices sur des composants système. Confirmer avant de lancer."
+                           Opacity="0.65" TextWrapping="Wrap" FontSize="12"/>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Button Content="Supprimer OneDrive"
+                            Command="{Binding RemoveOneDriveCommand}"/>
+                    <Button Content="Bloquer raccourcis Edge"
+                            Command="{Binding DisableEdgeShortcutsCommand}"/>
+                </StackPanel>
+                <TextBlock Text="{Binding ExtraStatusText}" Opacity="0.8" FontStyle="Italic" FontSize="12"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Page>

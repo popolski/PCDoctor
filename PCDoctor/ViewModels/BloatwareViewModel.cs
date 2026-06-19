@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -14,8 +15,11 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private ObservableCollection<BloatwareApp> apps = new();
         [ObservableProperty] private string statusText = "Cliquez sur Analyser pour détecter les bloatwares installés.";
         [ObservableProperty] private bool hasScanned;
+        [ObservableProperty] private string extraStatusText = "";
 
-        public event System.Func<string, Task<bool>>? ConfirmRequested;
+        public event Func<string, Task<bool>>? ConfirmRequested;
+        public event Func<string, Task<bool>>? OneDriveConfirmRequested;
+        public event Func<string, Task<bool>>? EdgeConfirmRequested;
 
         [RelayCommand]
         private void Scan()
@@ -42,6 +46,49 @@ namespace PCDoctor.ViewModels
             var (success, err) = _svc.Remove(selected);
             StatusText = $"Terminé : {success} désinstallée(s)" + (err > 0 ? $", {err} échec(s)." : ".");
             Scan();
+        }
+
+        [RelayCommand]
+        private async Task RemoveOneDrive()
+        {
+            bool ok = true;
+            if (OneDriveConfirmRequested != null)
+                ok = await OneDriveConfirmRequested.Invoke(
+                    "Désinstaller OneDrive complètement ?\n\n" +
+                    "Cette action :\n" +
+                    "• Arrête le processus OneDrive\n" +
+                    "• Lance le désinstalleur officiel\n" +
+                    "• Supprime les dossiers résiduels\n" +
+                    "• Retire l'icône de l'Explorateur\n\n" +
+                    "Sauvegardez d'abord vos fichiers OneDrive locaux si nécessaire.");
+            if (!ok) { ExtraStatusText = "Suppression OneDrive annulée."; return; }
+
+            ExtraStatusText = "Suppression OneDrive en cours...";
+            var result = await Task.Run(() => _svc.RemoveOneDrive());
+            ExtraStatusText = "OneDrive supprimé. " + result.Replace("\n", " ");
+        }
+
+        [RelayCommand]
+        private async Task DisableEdgeShortcuts()
+        {
+            bool ok = true;
+            if (EdgeConfirmRequested != null)
+                ok = await EdgeConfirmRequested.Invoke(
+                    "Empêcher Edge de recréer ses raccourcis bureau et barre des tâches à chaque mise à jour ?\n\n" +
+                    "Applique une stratégie locale (HKLM\\SOFTWARE\\Policies\\Microsoft\\EdgeUpdate).");
+            if (!ok) { ExtraStatusText = "Action annulée."; return; }
+
+            try
+            {
+                _svc.DisableEdgeShortcuts();
+                ExtraStatusText = _svc.IsEdgeShortcutsDisabled()
+                    ? "Raccourcis Edge bloqués avec succès."
+                    : "Paramètre appliqué.";
+            }
+            catch (Exception ex)
+            {
+                ExtraStatusText = $"Erreur : {ex.Message}";
+            }
         }
     }
 }
