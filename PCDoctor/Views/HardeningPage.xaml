@@ -54,6 +54,35 @@
                 </Grid>
             </Border>
 
+            <!-- Defender -->
+            <TextBlock Text="Windows Defender" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <StackPanel Spacing="12">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="Signatures antivirus" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Text="{Binding SignatureInfo}" Opacity="0.7" FontFamily="Consolas" FontSize="12"/>
+                    </StackPanel>
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Mettre à jour les signatures"
+                                Command="{Binding UpdateSignaturesCommand}"
+                                IsEnabled="{Binding CanUseDefender}"
+                                HorizontalAlignment="Stretch"
+                                Style="{StaticResource AccentButtonStyle}"/>
+                        <Button Grid.Column="1" Content="Lancer un scan rapide"
+                                Command="{Binding QuickScanCommand}"
+                                IsEnabled="{Binding CanUseDefender}"
+                                HorizontalAlignment="Stretch"/>
+                    </Grid>
+                    <ProgressBar IsIndeterminate="{Binding IsDefenderBusy}"/>
+                </StackPanel>
+            </Border>
+
             <TextBlock Text="{Binding StatusText}" Opacity="0.8" FontStyle="Italic"/>
         </StackPanel>
     </ScrollViewer>
