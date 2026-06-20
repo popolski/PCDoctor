@@ -14,6 +14,9 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private string pendingText    = "Cliquez sur Vérifier pour lancer la recherche (peut prendre 20-30 secondes).";
         [ObservableProperty] private bool   isChecking;
         [ObservableProperty] private bool   canCheck       = true;
+        [ObservableProperty] private bool   featureUpdatesBlocked;
+        [ObservableProperty] private bool   updatesPaused;
+        private bool _loading;
 
         public UpdatesViewModel()
         {
@@ -22,7 +25,14 @@ namespace PCDoctor.ViewModels
             RebootText  = reboot
                 ? "Oui - un redémarrage est en attente pour appliquer une mise à jour."
                 : "Non - aucun redémarrage nécessaire.";
+            _loading = true;
+            FeatureUpdatesBlocked = _svc.IsFeatureUpdatesBlocked();
+            UpdatesPaused         = _svc.IsUpdatesPaused();
+            _loading = false;
         }
+
+        partial void OnFeatureUpdatesBlockedChanged(bool v) { if (_loading) return; _svc.SetBlockFeatureUpdates(v); }
+        partial void OnUpdatesPausedChanged(bool v)         { if (_loading) return; _svc.SetPauseUpdates(v); }
 
         [RelayCommand]
         private async Task CheckPending()

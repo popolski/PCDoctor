@@ -60,6 +60,53 @@ namespace PCDoctor.Services
             catch (Exception e) { Logger.Warn($"SetNumLockOnBoot : {e.Message}"); }
         }
 
+        // ─── Alignement barre des tâches (Win 11) ───
+        // TaskbarAl : 0 = gauche, 1 = centre (défaut Win11)
+        public bool IsTaskbarCentered() => GetHkcu(Advanced, "TaskbarAl") != 0;
+        public void SetTaskbarCentered(bool v) => SetHkcu(Advanced, "TaskbarAl", v ? 1 : 0);
+
+        // ─── Barre de recherche ───
+        // SearchboxTaskbarMode : 0 = masquée, 1 = icône, 2 = barre complète
+        private const string SearchKey = @"Software\Microsoft\Windows\CurrentVersion\Search";
+        public int GetSearchBarMode() => GetHkcu(SearchKey, "SearchboxTaskbarMode") ?? 2;
+        public void SetSearchBarMode(int mode) => SetHkcu(SearchKey, "SearchboxTaskbarMode", mode);
+
+        // ─── Widgets ───
+        // TaskbarDa : 1 = visible (défaut), 0 = masqué
+        public bool IsWidgetsEnabled() => GetHkcu(Advanced, "TaskbarDa") != 0;
+        public void SetWidgets(bool v) => SetHkcu(Advanced, "TaskbarDa", v ? 1 : 0);
+
+        // ─── Menu contextuel classique (Win 11) ───
+        // Créer la clé avec une valeur par défaut vide = ancien menu ; supprimer = nouveau menu
+        private const string ClassicMenuKey = @"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32";
+        public bool IsClassicContextMenu()
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(ClassicMenuKey);
+                return key != null;
+            }
+            catch { return false; }
+        }
+        public void SetClassicContextMenu(bool v)
+        {
+            try
+            {
+                if (v)
+                {
+                    using var key = Registry.CurrentUser.CreateSubKey(ClassicMenuKey);
+                    key?.SetValue("", "", RegistryValueKind.String);
+                }
+                else
+                {
+                    Registry.CurrentUser.DeleteSubKeyTree(
+                        @"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}",
+                        throwOnMissingSubKey: false);
+                }
+            }
+            catch (Exception e) { Logger.Warn($"SetClassicContextMenu : {e.Message}"); }
+        }
+
         // ─── Redémarrer l'Explorateur (pour appliquer les changements) ───
         public void RestartExplorer()
         {

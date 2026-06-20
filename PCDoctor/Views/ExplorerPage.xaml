@@ -93,6 +93,71 @@
                 </Grid>
             </Border>
 
+            <!-- Barre des tâches -->
+            <TextBlock Text="Barre des tâches" Style="{StaticResource SectionTitleStyle}"/>
+
+            <!-- Alignement -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Icônes centrées" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = icônes au centre (style Windows 11). OFF = icônes à gauche (style classique).</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding TaskbarCentered, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = alignement à gauche comme Windows 10</ToolTipService.ToolTip>
+                    </ToggleSwitch>
+                </Grid>
+            </Border>
+
+            <!-- Barre de recherche -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="6">
+                        <TextBlock Text="Barre de recherche" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Apparence de la zone de recherche dans la barre des tâches.</TextBlock>
+                        <ComboBox SelectedIndex="{Binding SearchBarMode, Mode=TwoWay}" MinWidth="200">
+                            <ComboBoxItem Content="Masquée"/>
+                            <ComboBoxItem Content="Icône seule"/>
+                            <ComboBoxItem Content="Barre complète"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Widgets -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Widgets (actualités, météo...)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">Bouton Widgets dans la barre des tâches. OFF = masqué.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding WidgetsEnabled, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = bouton Widgets retiré de la barre des tâches</ToolTipService.ToolTip>
+                    </ToggleSwitch>
+                </Grid>
+            </Border>
+
+            <!-- Menu contextuel classique -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="4">
+                        <TextBlock Text="Menu contextuel classique (Win 11)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = menu clic droit complet directement (plus de "Afficher plus d'options"). Redémarrage Explorateur requis.</TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding ClassicContextMenu, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = supprime le sous-menu "Afficher plus d'options"</ToolTipService.ToolTip>
+                    </ToggleSwitch>
+                </Grid>
+            </Border>
+
             <!-- Ergonomie -->
             <TextBlock Text="Ergonomie" Style="{StaticResource SectionTitleStyle}"/>
 

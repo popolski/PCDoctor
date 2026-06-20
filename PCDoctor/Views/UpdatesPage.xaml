@@ -46,6 +46,43 @@
                 </StackPanel>
             </Border>
 
+            <!-- Politique de mise à jour -->
+            <TextBlock Text="Politique de mise à jour" Style="{StaticResource SectionTitleStyle}"/>
+
+            <!-- Bloquer MAJ fonctionnalités -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="4">
+                        <TextBlock Text="Bloquer les mises à jour de fonctionnalités" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">
+                            ON = Windows reste sur la version actuelle (TargetReleaseVersion). Vous recevez toujours les correctifs de sécurité, mais pas les nouvelles versions (22H2 → 23H2, etc.).
+                        </TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding FeatureUpdatesBlocked, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = version Windows figée, correctifs de sécurité maintenus</ToolTipService.ToolTip>
+                    </ToggleSwitch>
+                </Grid>
+            </Border>
+
+            <!-- Pause MAJ -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="4">
+                        <TextBlock Text="Mettre les mises à jour en pause (4 semaines)" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Opacity="0.7" TextWrapping="Wrap">
+                            ON = suspend toutes les MAJ pour 4 semaines (qualité) et 52 semaines (fonctionnalités). Utile pour éviter les mises à jour automatiques non désirées.
+                        </TextBlock>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding UpdatesPaused, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = aucune MAJ installée pendant 4 semaines</ToolTipService.ToolTip>
+                    </ToggleSwitch>
+                </Grid>
+            </Border>
+
             <!-- Actions -->
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,4,0,0">
                 <Button Content="Ouvrir Windows Update"

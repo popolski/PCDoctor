@@ -16,6 +16,11 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool iconsOnly;
         [ObservableProperty] private bool endTaskEnabled;
         [ObservableProperty] private bool numLockOnBoot;
+        // Barre des tâches
+        [ObservableProperty] private bool taskbarCentered;
+        [ObservableProperty] private int  searchBarMode;
+        [ObservableProperty] private bool widgetsEnabled;
+        [ObservableProperty] private bool classicContextMenu;
         [ObservableProperty] private string statusText = "";
 
         public ExplorerViewModel() { Sync(); }
@@ -23,13 +28,17 @@ namespace PCDoctor.ViewModels
         private void Sync()
         {
             _loading = true;
-            FileExtVisible     = _svc.IsFileExtVisible();
-            HiddenVisible      = _svc.IsHiddenVisible();
-            SuperHiddenVisible = _svc.IsSuperHiddenVisible();
-            FullPathInTitle    = _svc.IsFullPathInTitle();
-            IconsOnly          = _svc.IsIconsOnly();
-            EndTaskEnabled     = _svc.IsEndTaskEnabled();
-            NumLockOnBoot      = _svc.IsNumLockOnBoot();
+            FileExtVisible      = _svc.IsFileExtVisible();
+            HiddenVisible       = _svc.IsHiddenVisible();
+            SuperHiddenVisible  = _svc.IsSuperHiddenVisible();
+            FullPathInTitle     = _svc.IsFullPathInTitle();
+            IconsOnly           = _svc.IsIconsOnly();
+            EndTaskEnabled      = _svc.IsEndTaskEnabled();
+            NumLockOnBoot       = _svc.IsNumLockOnBoot();
+            TaskbarCentered     = _svc.IsTaskbarCentered();
+            SearchBarMode       = _svc.GetSearchBarMode();
+            WidgetsEnabled      = _svc.IsWidgetsEnabled();
+            ClassicContextMenu  = _svc.IsClassicContextMenu();
             _loading = false;
         }
 
@@ -39,7 +48,11 @@ namespace PCDoctor.ViewModels
         partial void OnFullPathInTitleChanged(bool v)    { if (_loading) return; _svc.SetFullPathInTitle(v);    StatusText = v ? "Chemin complet dans la barre de titre" : "Chemin complet désactivé"; }
         partial void OnIconsOnlyChanged(bool v)          { if (_loading) return; _svc.SetIconsOnly(v);          StatusText = v ? "Vignettes désactivées (icônes seules)" : "Vignettes activées"; }
         partial void OnEndTaskEnabledChanged(bool v)     { if (_loading) return; _svc.SetEndTask(v);            StatusText = v ? "\"Fin de tâche\" disponible dans la barre des tâches" : "\"Fin de tâche\" masqué"; }
-        partial void OnNumLockOnBootChanged(bool v)      { if (_loading) return; _svc.SetNumLockOnBoot(v);      StatusText = v ? "NumLock activé au démarrage" : "NumLock désactivé au démarrage"; }
+        partial void OnNumLockOnBootChanged(bool v)       { if (_loading) return; _svc.SetNumLockOnBoot(v);        StatusText = v ? "NumLock activé au démarrage" : "NumLock désactivé au démarrage"; }
+        partial void OnTaskbarCenteredChanged(bool v)     { if (_loading) return; _svc.SetTaskbarCentered(v);     StatusText = v ? "Barre des tâches centrée" : "Barre des tâches à gauche"; }
+        partial void OnSearchBarModeChanged(int v)        { if (_loading) return; _svc.SetSearchBarMode(v);       StatusText = v == 0 ? "Recherche masquée" : v == 1 ? "Recherche : icône" : "Barre de recherche complète"; }
+        partial void OnWidgetsEnabledChanged(bool v)      { if (_loading) return; _svc.SetWidgets(v);             StatusText = v ? "Widgets activés" : "Widgets masqués"; }
+        partial void OnClassicContextMenuChanged(bool v)  { if (_loading) return; _svc.SetClassicContextMenu(v);  StatusText = v ? "Menu contextuel classique activé (redémarrage Explorateur requis)" : "Menu contextuel Windows 11 restauré"; }
 
         [RelayCommand]
         private void RestartExplorer()
