@@ -114,22 +114,20 @@ namespace PCDoctor.Services
 
         private static bool IsSmartScreenPuaEnabled()
         {
-            // Cherche dans les deux emplacements : GPO (Policies) puis Defender direct
-            foreach (var path in new[]
+            // Get-MpPreference est la seule source fiable : les cles registre varient
+            // selon que la protection est activee via UI ou via GPO.
+            // HealthService tourne dans Task.Run, donc PS ne bloque pas l'UI.
+            try
             {
-                @"SOFTWARE\Policies\Microsoft\Windows Defender\MpEngine",
-                @"SOFTWARE\Microsoft\Windows Defender\MpEngine",
-            })
-            {
-                try
-                {
-                    using var key = Registry.LocalMachine.OpenSubKey(path);
-                    var v = key?.GetValue("MpEnablePus");
-                    if (v is int i) return i == 1;
-                }
-                catch { }
+                var psi = new System.Diagnostics.ProcessStartInfo("powershell",
+                    "-NoProfile -Command \"(Get-MpPreference).PUAProtection\"")
+                { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
+                using var p = System.Diagnostics.Process.Start(psi)!;
+                string o = p.StandardOutput.ReadToEnd().Trim();
+                p.WaitForExit();
+                return o == "1";
             }
-            return false;
+            catch { return false; }
         }
 
         private static bool IsLocationDisabled()
