@@ -14,7 +14,7 @@
     <Nullable>enable</Nullable>
 	<ApplicationIcon>Assets\pcdoctor.ico</ApplicationIcon>
 	<WindowsPackageType>None</WindowsPackageType>
-	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+	<WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\AccueilPage.xaml" />
@@ -134,8 +134,9 @@
 
   <!-- Publish Properties -->
   <PropertyGroup>
-    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
-    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+    <PublishReadyToRun>False</PublishReadyToRun>
     <PublishTrimmed>False</PublishTrimmed>
+    <!-- Disable CsWinRT AOT vtable generation (GlobalVtableLookup causes TypeLoadException at runtime) -->
+    <CsWinRTAotOptimizerEnabled>false</CsWinRTAotOptimizerEnabled>
   </PropertyGroup>
 </Project>
