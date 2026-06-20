@@ -2,21 +2,14 @@ using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace PCDoctor
 {
     public sealed partial class MainWindow : Window
     {
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr LoadImage(IntPtr hInst, string name, uint type, int cx, int cy, uint fuLoad);
-        private const uint WM_SETICON = 0x0080;
-        private const uint IMAGE_ICON = 1;
-        private const uint LR_LOADFROMFILE = 0x10;
         private static readonly string LastPageFile =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                          "PCDoctor", "lastpage.txt");
@@ -25,13 +18,14 @@ namespace PCDoctor
         {
             this.InitializeComponent();
 
-            // Icône dans la barre de titre
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            var exePath = Environment.ProcessPath ?? Path.Combine(AppContext.BaseDirectory, "PCDoctor.exe");
-            var hBig   = LoadImage(IntPtr.Zero, exePath, IMAGE_ICON, 256, 256, LR_LOADFROMFILE);
-            var hSmall = LoadImage(IntPtr.Zero, exePath, IMAGE_ICON,  16,  16, LR_LOADFROMFILE);
-            SendMessage(hwnd, WM_SETICON, new IntPtr(1), hBig);
-            SendMessage(hwnd, WM_SETICON, new IntPtr(0), hSmall);
+            // Barre de titre custom
+            ExtendsContentIntoTitleBar = true;
+            SetTitleBar(AppTitleBar);
+            AppWindow.TitleBar.ButtonBackgroundColor = Microsoft.UI.Colors.Transparent;
+            AppWindow.TitleBar.ButtonInactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
+            var icoPath = Path.Combine(AppContext.BaseDirectory, "Assets", "pcdoctor.ico");
+            if (File.Exists(icoPath))
+                TitleBarIcon.Source = new BitmapImage(new Uri(icoPath));
 
             // Mica backdrop (effet transparence/profondeur Windows 11)
             if (MicaController.IsSupported())

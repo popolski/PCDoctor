@@ -10,8 +10,20 @@
     Title="PCDoctor">
 
     <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <!-- Barre de titre custom -->
+        <Grid x:Name="AppTitleBar" Height="32" VerticalAlignment="Top" Canvas.ZIndex="1">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0" Spacing="8">
+                <Image x:Name="TitleBarIcon" Width="16" Height="16" VerticalAlignment="Center"/>
+                <TextBlock Text="PCDoctor" VerticalAlignment="Center"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
+            </StackPanel>
+        </Grid>
+
         <NavigationView
             x:Name="NavView"
+            Margin="0,32,0,0"
             PaneDisplayMode="Left"
             IsBackButtonVisible="Collapsed"
             IsSettingsVisible="True"
