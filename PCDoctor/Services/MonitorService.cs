@@ -129,6 +129,16 @@ namespace PCDoctor.Services
             }
             catch { }
 
+            try
+            {
+                var raw = RunPs(
+                    "Get-WmiObject MSAcpi_ThermalZoneTemperature -Namespace root/wmi | " +
+                    "Select-Object -First 1 -ExpandProperty CurrentTemperature");
+                if (int.TryParse(raw.Trim(), out int tenthsK) && tenthsK > 0)
+                    d["Température CPU"] = $"{(tenthsK - 2732) / 10.0:F0} °C (approx.)";
+            }
+            catch { }
+
             return d;
         }
 

@@ -1,9 +1,12 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Security.Principal;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using PCDoctor.Services;
 
 namespace PCDoctor.Views
 {
@@ -19,10 +22,8 @@ namespace PCDoctor.Views
 
         private void SettingsPage_Loaded(object sender, RoutedEventArgs e)
         {
-            // Version
             VersionText.Text = "Version 3.0 — édition WinUI";
 
-            // Statut admin
             var id = WindowsIdentity.GetCurrent();
             var principal = new WindowsPrincipal(id);
             bool isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
@@ -30,7 +31,6 @@ namespace PCDoctor.Views
                 ? "✅ L'application s'exécute avec les droits administrateur."
                 : "⚠️ Droits administrateur absents : certaines actions système échoueront.";
 
-            // Thème courant
             if (App.MainWindowRef is MainWindow mw && mw.Content is FrameworkElement fe)
             {
                 ThemeCombo.SelectedIndex = fe.RequestedTheme switch
@@ -91,6 +91,68 @@ namespace PCDoctor.Views
                 Process.Start(new ProcessStartInfo("explorer.exe", folder) { UseShellExecute = true });
             }
             catch { }
+        }
+
+        // ─── Sauvegarde & Restauration ───────────────────────────────────────
+
+        private async void ExportBackup_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var svc = new BackupService();
+                string path = await Task.Run(() => svc.Export());
+                ShowBackupStatus($"✅ Exporté sur le Bureau : {Path.GetFileName(path)}");
+            }
+            catch (Exception ex) { ShowBackupStatus($"❌ Erreur : {ex.Message}"); }
+        }
+
+        private async void ImportBackup_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var picker = new Windows.Storage.Pickers.FileOpenPicker();
+                IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindowRef);
+                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+                picker.FileTypeFilter.Add(".json");
+                picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
+                var file = await picker.PickSingleFileAsync();
+                if (file == null) return;
+
+                ShowBackupStatus("⏳ Restauration en cours...");
+                var svc = new BackupService();
+                string msg = await Task.Run(() => svc.Import(file.Path));
+                ShowBackupStatus($"✅ {msg}");
+            }
+            catch (Exception ex) { ShowBackupStatus($"❌ Erreur : {ex.Message}"); }
+        }
+
+        private void ShowBackupStatus(string msg)
+        {
+            BackupStatus.Text = msg;
+            BackupStatus.Visibility = Visibility.Visible;
+        }
+
+        // ─── Historique des actions ───────────────────────────────────────────
+
+        private void RefreshHistory_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string logPath = Logger.GetLogPath();
+                if (!File.Exists(logPath))
+                {
+                    HistoryText.Text = "(Aucune action enregistrée aujourd'hui)";
+                    return;
+                }
+                var lines = File.ReadLines(logPath)
+                    .Where(l => l.Contains("[ACTION]"))
+                    .TakeLast(30)
+                    .ToList();
+                HistoryText.Text = lines.Count == 0
+                    ? "(Aucune action enregistrée aujourd'hui)"
+                    : string.Join("\n", lines);
+            }
+            catch (Exception ex) { HistoryText.Text = $"Erreur : {ex.Message}"; }
         }
     }
 }

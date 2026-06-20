@@ -1,4 +1,7 @@
+using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -41,6 +44,27 @@ namespace PCDoctor.ViewModels
             var res = await Task.Run(work);
             Apply(res);
             IsBusy = false;
+        }
+
+        [RelayCommand]
+        private void ExportCsv()
+        {
+            if (Rows.Count == 0) return;
+            var sb = new StringBuilder();
+            var heads = new[] { H1, H2, H3, H4 }.Where(h => !string.IsNullOrEmpty(h));
+            if (heads.Any()) sb.AppendLine(string.Join(";", heads));
+            foreach (var r in Rows)
+            {
+                var cols = new[] { r.Col1, r.Col2, r.Col3, r.Col4 }
+                    .Select(c => c.Contains(';') || c.Contains('\n')
+                        ? $"\"{c.Replace("\"", "\"\"")}\"" : c);
+                sb.AppendLine(string.Join(";", cols).TrimEnd(';'));
+            }
+            string path = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                $"PCDoctor_Audit_{DateTime.Now:yyyyMMdd_HHmm}.csv");
+            File.WriteAllText(path, sb.ToString(), System.Text.Encoding.UTF8);
+            Logger.Action($"Audit exporté CSV : {Path.GetFileName(path)}");
         }
 
         [RelayCommand]
