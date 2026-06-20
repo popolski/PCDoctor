@@ -92,19 +92,20 @@
             <TextBlock Text="Score de santé" FontSize="24" FontWeight="SemiBold" Margin="0,8,0,0"/>
 
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderThickness="1"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                    CornerRadius="8" Padding="20" BorderThickness="2"
+                    BorderBrush="{Binding ScoreColor}">
                 <Grid ColumnSpacing="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Jauge circulaire simulée avec ProgressRing + texte -->
+                    <!-- Score numérique coloré -->
                     <Grid Grid.Column="0" Width="100" Height="100">
                         <ProgressRing IsActive="{Binding HealthLoading}" Width="100" Height="100"/>
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock HorizontalAlignment="Center" FontSize="28" FontWeight="Bold">
+                            <TextBlock HorizontalAlignment="Center" FontSize="32" FontWeight="Bold"
+                                       Foreground="{Binding ScoreColor}">
                                 <Run Text="{Binding ScoreOk}"/>
                             </TextBlock>
                             <TextBlock HorizontalAlignment="Center" Opacity="0.6" FontSize="13">
@@ -114,9 +115,10 @@
                     </Grid>
 
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
-                        <TextBlock Text="{Binding ScoreText}" FontSize="15" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding ScoreText}" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{Binding ScoreColor}"/>
                         <ProgressBar Value="{Binding ScoreOk}" Maximum="{Binding ScoreTotal}"
-                                     Height="8"/>
+                                     Height="8" Foreground="{Binding ScoreColor}"/>
                         <TextBlock Opacity="0.65" FontSize="12" TextWrapping="Wrap">
                             Vérifications de sécurité, confidentialité et optimisations recommandées.
                         </TextBlock>

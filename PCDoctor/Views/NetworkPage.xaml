@@ -22,7 +22,9 @@
                         <TextBlock Text="IPv6" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Protocole réseau. ON = activé (recommandé par Microsoft). OFF déconseillé (peut casser Teams/Xbox)." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding Ipv6Active, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding Ipv6Active, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON recommandé — OFF peut casser Teams et Xbox Live</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -36,7 +38,9 @@
                         <TextBlock Text="DNS-over-HTTPS (Cloudflare)" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Chiffre vos requêtes DNS. ON = votre FAI ne voit plus les sites résolus." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding DohActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding DohActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = requêtes DNS chiffrées via 1.1.1.1 (Cloudflare)</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 

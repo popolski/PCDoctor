@@ -26,7 +26,9 @@
                         <TextBlock Text="Plan Hautes performances" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Passe sur le plan Ultimate Performance (ou Hautes performances). OFF = revient sur Equilibre." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding HighPerfActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding HighPerfActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = plan Ultimate Performance — déconseillé sur laptop batterie</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -41,7 +43,9 @@
                         <TextBlock Text="Game Mode Windows" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Optimise l'allocation CPU/GPU quand un jeu est en premier plan. Recommande ON." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding GameModeActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding GameModeActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON recommandé — priorise les ressources pour les jeux</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -59,7 +63,9 @@
                             <TextBlock Text="&#x26A0; Necessite un redemarrage pour prendre effet." FontSize="12" TextWrapping="Wrap"/>
                         </Border>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding HagsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding HagsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON recommandé sur GPU récent (RTX 2000+ / RX 5000+)</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -74,7 +80,9 @@
                         <TextBlock Text="Xbox Game Bar" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Overlay Xbox (Win+G). OFF = desactive la capture et l'overlay pour reduire l'overhead." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding GameBarActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding GameBarActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = réduit l'overhead, désactive Win+G</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -89,7 +97,9 @@
                         <TextBlock Text="Priorite GPU (Win32PrioritySeparation)" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="ON = intervalles CPU courts et fixes, boost premier-plan maximal (valeur 38). OFF = valeur Windows standard (2)." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding GpuPriorityActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding GpuPriorityActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = intervalles CPU courts, priorité premier-plan maximale</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -104,7 +114,9 @@
                         <TextBlock Text="Acceleration souris (Enhance Pointer Precision)" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="ON = Windows ajuste la vitesse selon le mouvement. OFF recommande en FPS : visee 1:1 avec le capteur." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding MouseAccelActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding MouseAccelActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF recommandé en FPS — visée 1:1 avec le capteur souris</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -119,7 +131,9 @@
                         <TextBlock Text="Désactiver l'algorithme de Nagle (TCP)" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = Nagle desactive (TcpAckFrequency=1, TCPNoDelay=1) : envoie chaque paquet immediatement, reduit la latence reseau en jeu. OFF = comportement TCP standard.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding NagleDisabled, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding NagleDisabled, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = paquets envoyés sans délai — réduit le ping en jeu</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 

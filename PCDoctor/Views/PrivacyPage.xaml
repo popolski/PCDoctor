@@ -26,7 +26,9 @@
                         <TextBlock Text="Télémétrie Windows" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Collecte de données de diagnostic. OFF = désactivée (n'impacte pas les MAJ)." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding TelemetryActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding TelemetryActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF recommandé — désactive l'envoi de données à Microsoft</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -41,7 +43,9 @@
                         <TextBlock Text="Cortana" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Assistant vocal Microsoft. OFF = recherche locale seule." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding CortanaActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding CortanaActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = recherche locale uniquement, sans cloud Microsoft</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -56,7 +60,9 @@
                         <TextBlock Text="Activity History" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Suivi de votre activité. OFF = Windows ne tracke plus." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding ActivityActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding ActivityActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = historique d'activité désactivé et effacé</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -71,7 +77,9 @@
                         <TextBlock Text="Pubs et suggestions" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Suggestions dans le menu Démarrer et l'écran de verrouillage. OFF = supprimées." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding AdsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding AdsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = plus de pubs dans le menu Démarrer et l'écran de verrouillage</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -86,7 +94,9 @@
                         <TextBlock Text="Advertising ID" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Identifiant publicitaire. OFF = désactivé." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding AdIdActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding AdIdActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = suivi publicitaire cross-application désactivé</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -101,7 +111,9 @@
                         <TextBlock Text="Télémétrie Office" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Collecte de données par Microsoft Office. OFF = désactivée." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding OfficeActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding OfficeActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = Microsoft Office n'envoie plus de données d'usage</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -116,7 +128,9 @@
                         <TextBlock Text="Wi-Fi Sense" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">Partage automatique de vos réseaux Wi-Fi avec vos contacts Outlook/Skype. OFF = vos mots de passe Wi-Fi ne sont jamais partagés.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding WifiSenseActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding WifiSenseActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = mots de passe Wi-Fi non partagés avec vos contacts</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -128,7 +142,9 @@
                         <TextBlock Text="Applications en arrière-plan" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">Autorise les apps à recevoir des infos, envoyer des notifications et se mettre à jour même quand vous ne les utilisez pas. OFF = bloque tout.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding BackgroundAppsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding BackgroundAppsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = apps bloquées en arrière-plan, économie de batterie</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -146,7 +162,9 @@
                             <TextBlock FontSize="11" TextWrapping="Wrap">Fonctionnalité Windows 11 24H2+. Sans effet sur les versions antérieures.</TextBlock>
                         </Border>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding RecallActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding RecallActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF fortement recommandé — screenshots en continu stockés localement</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -158,11 +176,13 @@
                         <TextBlock Text="Localisation" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">Accès des applications à votre position géographique. OFF = aucune app ne peut lire votre localisation.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding LocationActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding LocationActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = aucune application ne peut accéder à votre position GPS</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
-            <!-- Séparateur IA / Copilot -->
+            <!-- Intelligence artificielle -->
             <TextBlock Text="Intelligence artificielle" Style="{StaticResource SectionTitleStyle}"/>
 
             <!-- Copilot -->
@@ -174,7 +194,9 @@
                         <TextBlock Text="Copilot Windows" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">Assistant IA intégré à Windows 11. OFF = désactivé via stratégie (bouton de barre des tâches supprimé).</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding CopilotActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding CopilotActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = bouton Copilot supprimé de la barre des tâches</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -187,7 +209,9 @@
                         <TextBlock Text="Suggestions IA dans la recherche" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">Résultats enrichis par IA dans la barre de recherche Windows. OFF = recherche classique locale/web uniquement.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding AiSearchActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding AiSearchActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = résultats de recherche locaux uniquement, sans IA</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -200,7 +224,9 @@
                         <TextBlock Text="Contenu suggéré dans les Paramètres" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">Windows affiche des suggestions et promotions dans l'app Paramètres. OFF = interface épurée.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SettingsSuggestionsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SettingsSuggestionsActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = plus de promotions dans l'application Paramètres</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 

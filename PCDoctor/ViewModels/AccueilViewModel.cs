@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml.Media;
+using Windows.UI;
 using PCDoctor.Services;
 
 namespace PCDoctor.ViewModels
@@ -63,6 +65,20 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private ObservableCollection<HealthCheck> healthChecks = new();
         [ObservableProperty] private bool healthLoading = true;
 
+        public Brush ScoreColor
+        {
+            get
+            {
+                if (ScoreTotal == 0) return new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
+                double pct = (double)ScoreOk / ScoreTotal;
+                return pct >= 1.0
+                    ? new SolidColorBrush(Color.FromArgb(255, 76,  175, 80))   // vert
+                    : pct >= 0.7
+                    ? new SolidColorBrush(Color.FromArgb(255, 255, 152, 0))    // orange
+                    : new SolidColorBrush(Color.FromArgb(255, 244, 67,  54));  // rouge
+            }
+        }
+
         public AccueilViewModel()
         {
             LoadData();
@@ -102,6 +118,7 @@ namespace PCDoctor.ViewModels
                 ? "Toutes les recommandations sont appliquées."
                 : $"{checks.Count - ok} recommandation(s) en attente.";
             HealthLoading = false;
+            OnPropertyChanged(nameof(ScoreColor));
             AppState.NotifyScore(ok, checks.Count);
         }
     }

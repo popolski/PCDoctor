@@ -27,7 +27,9 @@
                         <TextBlock Text="Afficher les extensions de fichiers" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = vous voyez .exe, .docx, .jpg... Recommandé : évite les pièges (fichier.pdf.exe).</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding FileExtVisible, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding FileExtVisible, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON recommandé — évite les arnaques par double extension</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -40,7 +42,9 @@
                         <TextBlock Text="Afficher les fichiers cachés" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = les dossiers/fichiers avec l'attribut "caché" sont visibles (AppData, ProgramData...)</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding HiddenVisible, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding HiddenVisible, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = AppData, ProgramData et autres dossiers cachés visibles</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -53,7 +57,9 @@
                         <TextBlock Text="Afficher les fichiers système protégés" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = affiche pagefile.sys, hiberfil.sys, ntldr... Utile pour le diagnostic, à laisser OFF en usage normal.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SuperHiddenVisible, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SuperHiddenVisible, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF en usage normal, ON uniquement pour le diagnostic</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -66,7 +72,9 @@
                         <TextBlock Text="Chemin complet dans la barre de titre" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = affiche C:\Users\...\Documents au lieu de "Documents" dans le titre de la fenêtre.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding FullPathInTitle, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding FullPathInTitle, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = chemin absolu visible dans la barre de titre</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -79,7 +87,9 @@
                         <TextBlock Text="Désactiver les vignettes (icônes seules)" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = icônes génériques uniquement, plus rapide sur disque dur lent. OFF = aperçu miniature des images/vidéos.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding IconsOnly, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding IconsOnly, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON sur HDD lent = Explorateur plus réactif</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -95,7 +105,9 @@
                         <TextBlock Text="&quot;Fin de tâche&quot; dans la barre des tâches (Win 11)" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = clic droit sur une app dans la barre des tâches propose "Fin de tâche" directement, sans passer par le Gestionnaire des tâches.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding EndTaskEnabled, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding EndTaskEnabled, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = tuer une app en un clic droit depuis la barre des tâches</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -108,7 +120,9 @@
                         <TextBlock Text="NumLock activé au démarrage" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = le pavé numérique est actif dès l'écran de connexion Windows.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding NumLockOnBoot, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding NumLockOnBoot, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = pavé numérique actif dès l'écran de connexion</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 

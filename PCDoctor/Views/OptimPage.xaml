@@ -21,7 +21,9 @@
                         <TextBlock Text="Hibernation" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Text="Mode hibernation. OFF = désactivé (libère plusieurs Go via hiberfil.sys)." Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding HibernationActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding HibernationActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF recommandé sur SSD — libère le fichier hiberfil.sys</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -36,7 +38,9 @@
                             Hybride entre arrêt et hibernation. OFF = arrêt complet à chaque extinction (recommandé pour la stabilité et les MAJ).
                         </TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding FastStartupActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding FastStartupActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF recommandé — évite les problèmes de mises à jour</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -51,7 +55,9 @@
                             Windows peut brider le CPU de certains processus pour économiser de l'énergie. ON = bridage désactivé (meilleures performances, surtout sur laptop).
                         </TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding PowerThrottlingDisabled, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding PowerThrottlingDisabled, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = CPU non bridé, meilleures perfs sur desktop</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -66,7 +72,9 @@
                             Windows compresse les pages mémoire inactives pour éviter le recours au fichier de swap. ON recommandé si RAM limitée ; OFF si RAM abondante (réduit la charge CPU).
                         </TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding MemoryCompressionActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding MemoryCompressionActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON si &lt; 16 Go RAM, OFF si RAM abondante</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -79,7 +87,9 @@
                         <TextBlock Text="Messages détaillés au démarrage" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = Windows affiche le détail des opérations en cours au démarrage et à l'arrêt ("Application des stratégies de groupe...", etc.). Utile pour le diagnostic.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding VerboseStatusActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding VerboseStatusActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>ON = détail des étapes de démarrage/arrêt affiché</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -92,7 +102,9 @@
                         <TextBlock Text="Horloge matérielle en UTC (dual-boot Linux)" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">ON = Windows stocke l'heure BIOS en UTC, comme Linux. Évite le décalage d'heure quand on alterne les deux OS. Redémarrage requis.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding UtcClockActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding UtcClockActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>Uniquement utile en dual-boot Windows/Linux</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -108,7 +120,9 @@
                         <TextBlock Text="SysMain (Superfetch)" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">Précharge les apps fréquentes en RAM. OFF conseillé sur SSD (inutile et actif en arrière-plan). ON recommandé sur HDD.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SysMainActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SysMainActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF sur SSD, ON sur HDD</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -121,7 +135,9 @@
                         <TextBlock Text="Indexation Windows Search" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">Indexe vos fichiers pour accélérer la recherche. OFF = recherche plus lente mais réduit l'activité disque. Conseillé OFF sur HDD ancien.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SearchIndexActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding SearchIndexActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF possible sur HDD lent pour réduire l'activité disque</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -134,7 +150,9 @@
                         <TextBlock Text="Windows Error Reporting" FontWeight="SemiBold" FontSize="16"/>
                         <TextBlock Opacity="0.7" TextWrapping="Wrap">Envoie des rapports de crash à Microsoft. OFF = aucun rapport envoyé, réduit légèrement l'activité après un crash.</TextBlock>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" IsOn="{Binding WerActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0"/>
+                    <ToggleSwitch Grid.Column="1" IsOn="{Binding WerActive, Mode=TwoWay}" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0">
+                        <ToolTipService.ToolTip>OFF = aucun rapport de crash envoyé à Microsoft</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 

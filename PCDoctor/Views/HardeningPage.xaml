@@ -25,7 +25,9 @@
                         <TextBlock Text="Protocole de résolution local. OFF = protégé contre les attaques relay. Recommandé : OFF."
                                    Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch IsOn="{Binding LlmnrActive, Mode=TwoWay}" HorizontalAlignment="Right"/>
+                    <ToggleSwitch IsOn="{Binding LlmnrActive, Mode=TwoWay}" HorizontalAlignment="Right">
+                        <ToolTipService.ToolTip>OFF recommandé — protège contre les attaques relay NTLM</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -38,7 +40,9 @@
                         <TextBlock Text="Protocole obsolète et vulnérable (EternalBlue/WannaCry). OFF = sécurisé. Reboot requis."
                                    Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch IsOn="{Binding Smb1Active, Mode=TwoWay}" HorizontalAlignment="Right"/>
+                    <ToggleSwitch IsOn="{Binding Smb1Active, Mode=TwoWay}" HorizontalAlignment="Right">
+                        <ToolTipService.ToolTip>OFF obligatoire — vulnérable à WannaCry/EternalBlue</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
@@ -51,7 +55,9 @@
                         <TextBlock Text="Bloque les applications potentiellement indésirables. ON = activé. Recommandé : ON."
                                    Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <ToggleSwitch IsOn="{Binding PuaActive, Mode=TwoWay}" HorizontalAlignment="Right"/>
+                    <ToggleSwitch IsOn="{Binding PuaActive, Mode=TwoWay}" HorizontalAlignment="Right">
+                        <ToolTipService.ToolTip>ON recommandé — bloque les PUP/adwares automatiquement</ToolTipService.ToolTip>
+                    </ToggleSwitch>
                 </Grid>
             </Border>
 
