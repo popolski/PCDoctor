@@ -20,7 +20,8 @@ namespace PCDoctor
             // Icône dans la barre de titre
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
             var winId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
-            Microsoft.UI.Windowing.AppWindow.GetFromWindowId(winId).SetIcon("Assets\\pcdoctor.ico");
+            var icoPath = Path.Combine(AppContext.BaseDirectory, "Assets", "pcdoctor.ico");
+            Microsoft.UI.Windowing.AppWindow.GetFromWindowId(winId).SetIcon(icoPath);
 
             // Mica backdrop (effet transparence/profondeur Windows 11)
             if (MicaController.IsSupported())
