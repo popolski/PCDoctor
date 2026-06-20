@@ -293,20 +293,23 @@ namespace PCDoctor.Services
             catch (Exception e) { return $"Erreur : {e.Message}"; }
         }
 
-        // Lance un scan rapide Defender
+        // Lance un scan rapide Defender via MpCmdRun.exe (plus fiable que Start-MpScan en session PS non-interactive)
         public string StartQuickScan()
         {
             try
             {
-                var psi = new ProcessStartInfo("powershell",
-                    "-NoProfile -Command \"Start-MpScan -ScanType QuickScan\"")
+                string mpCmd = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                    "Windows Defender", "MpCmdRun.exe");
+
+                var psi = new ProcessStartInfo(mpCmd, "-Scan -ScanType 1")
                 { UseShellExecute = false, CreateNoWindow = true };
                 using var p = Process.Start(psi)!;
                 p.WaitForExit();
-                Logger.Action("Scan rapide Defender lancé");
+                Logger.Action("Scan rapide Defender lancé (MpCmdRun)");
                 return p.ExitCode == 0
-                    ? "Scan rapide terminé."
-                    : $"Scan terminé avec le code {p.ExitCode}.";
+                    ? "Scan rapide lancé — visible dans Sécurité Windows."
+                    : $"MpCmdRun.exe a retourné le code {p.ExitCode}.";
             }
             catch (Exception e) { return $"Erreur : {e.Message}"; }
         }
