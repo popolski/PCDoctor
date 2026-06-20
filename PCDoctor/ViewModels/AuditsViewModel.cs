@@ -33,17 +33,32 @@ namespace PCDoctor.ViewModels
         // Audits lents (scan fichiers / PS lourd) - async
         [RelayCommand(CanExecute = nameof(CanRun))] private Task RunServices()         => RunAsync(_audit.AuditServices);
         [RelayCommand(CanExecute = nameof(CanRun))] private Task RunDrivers()          => RunAsync(_audit.AuditDrivers);
-        [RelayCommand(CanExecute = nameof(CanRun))] private Task RunShellExtensions()  => RunAsync(_audit.AuditShellExtensions);
-        [RelayCommand(CanExecute = nameof(CanRun))] private Task RunLargeFiles()       => RunAsync(_audit.AuditLargeFiles);
-        [RelayCommand(CanExecute = nameof(CanRun))] private Task RunBrowserExtensions()=> RunAsync(_audit.AuditBrowserExtensions);
+        [RelayCommand(CanExecute = nameof(CanRun))] private Task RunShellExtensions()  => RunAsync(_audit.AuditShellExtensions,  notify: true);
+        [RelayCommand(CanExecute = nameof(CanRun))] private Task RunLargeFiles()       => RunAsync(_audit.AuditLargeFiles,        notify: true);
+        [RelayCommand(CanExecute = nameof(CanRun))] private Task RunBrowserExtensions()=> RunAsync(_audit.AuditBrowserExtensions, notify: true);
 
-        private async Task RunAsync(System.Func<AuditResult> work)
+        private async Task RunAsync(System.Func<AuditResult> work, bool notify = false)
         {
             IsBusy = true;
             CurrentSubtitle = "Analyse en cours...";
             var res = await Task.Run(work);
             Apply(res);
             IsBusy = false;
+            if (notify) SendToast(res.Title, $"{Rows.Count} élément(s) trouvé(s)");
+        }
+
+        private static void SendToast(string title, string body)
+        {
+            try
+            {
+                var xml = $@"<toast><visual><binding template=""ToastGeneric"">
+                    <text>🩺 PCDoctor — {System.Security.SecurityElement.Escape(title)}</text>
+                    <text>{System.Security.SecurityElement.Escape(body)}</text>
+                    </binding></visual></toast>";
+                var notif = new Microsoft.Windows.AppNotifications.AppNotification(xml);
+                Microsoft.Windows.AppNotifications.AppNotificationManager.Default.Show(notif);
+            }
+            catch { }
         }
 
         [RelayCommand]

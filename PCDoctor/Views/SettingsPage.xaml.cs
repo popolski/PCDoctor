@@ -41,6 +41,7 @@ namespace PCDoctor.Views
                 };
             }
             _initialized = true;
+            RefreshHistory_Click(null!, null!);
         }
 
         private void ThemeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
