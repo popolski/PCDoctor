@@ -114,16 +114,22 @@ namespace PCDoctor.Services
 
         private static bool IsSmartScreenPuaEnabled()
         {
-            // PUAProtection est un setting Defender — on lit la clé PS laissée par Set-MpPreference
-            // Fallback : si clé absente on suppose désactivé
-            try
+            // Cherche dans les deux emplacements : GPO (Policies) puis Defender direct
+            foreach (var path in new[]
             {
-                using var key = Registry.LocalMachine.OpenSubKey(
-                    @"SOFTWARE\Policies\Microsoft\Windows Defender\MpEngine");
-                var v = key?.GetValue("MpEnablePus");
-                return v is int i && i == 1;
+                @"SOFTWARE\Policies\Microsoft\Windows Defender\MpEngine",
+                @"SOFTWARE\Microsoft\Windows Defender\MpEngine",
+            })
+            {
+                try
+                {
+                    using var key = Registry.LocalMachine.OpenSubKey(path);
+                    var v = key?.GetValue("MpEnablePus");
+                    if (v is int i) return i == 1;
+                }
+                catch { }
             }
-            catch { return false; }
+            return false;
         }
 
         private static bool IsLocationDisabled()
