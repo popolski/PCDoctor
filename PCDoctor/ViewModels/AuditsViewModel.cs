@@ -47,10 +47,16 @@ namespace PCDoctor.ViewModels
             if (notify) SendToast(res.Title, $"{Rows.Count} élément(s) trouvé(s)");
         }
 
+        private static bool _notifRegistered;
         private static void SendToast(string title, string body)
         {
             try
             {
+                if (!_notifRegistered)
+                {
+                    Microsoft.Windows.AppNotifications.AppNotificationManager.Default.Register();
+                    _notifRegistered = true;
+                }
                 var xml = $@"<toast><visual><binding template=""ToastGeneric"">
                     <text>🩺 PCDoctor — {System.Security.SecurityElement.Escape(title)}</text>
                     <text>{System.Security.SecurityElement.Escape(body)}</text>

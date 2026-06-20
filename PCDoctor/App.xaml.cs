@@ -45,8 +45,6 @@ namespace PCDoctor
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            try { Microsoft.Windows.AppNotifications.AppNotificationManager.Default.Register(); } catch { }
-
             _window = new MainWindow();
             MainWindowRef = _window;
             _window.Activate();
