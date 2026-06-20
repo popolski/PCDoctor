@@ -11,7 +11,9 @@ namespace PCDoctor.Services
         public bool   IsOk     { get; }
         public string PageTag  { get; }
         public string Advice   { get; }
-        public string Icon     => IsOk ? "✅" : "⚠️";
+        public string Icon          => IsOk ? "✅" : "⚠️";
+        public bool   IsClickable   => !IsOk && !string.IsNullOrEmpty(PageTag);
+        public double ArrowOpacity  => IsClickable ? 0.5 : 0.0;
 
         public HealthCheck(string label, string category, bool isOk, string pageTag, string advice)
         {

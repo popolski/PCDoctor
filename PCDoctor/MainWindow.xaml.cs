@@ -21,8 +21,13 @@ namespace PCDoctor
             if (MicaController.IsSupported())
                 this.SystemBackdrop = new MicaBackdrop();
 
-            // Badge score : mis a jour quand AccueilViewModel charge le score
-            AppState.ScoreChanged += UpdateScoreBadge;
+            // Badge score et navigation depuis les recommandations
+            AppState.ScoreChanged      += UpdateScoreBadge;
+            AppState.NavigateRequested += tag => DispatcherQueue.TryEnqueue(() =>
+            {
+                SelectItemByTag(tag);
+                Navigate(tag);
+            });
         }
 
         public void ApplyTheme(ElementTheme theme)

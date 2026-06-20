@@ -24,6 +24,14 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool defenderOk;
         [ObservableProperty] private string uptimeText = "";
 
+        // Navigation depuis une recommandation
+        [RelayCommand]
+        private void GoToCheck(Services.HealthCheck check)
+        {
+            if (!string.IsNullOrEmpty(check.PageTag))
+                AppState.RequestNavigate(check.PageTag);
+        }
+
         // Rapport
         [ObservableProperty] private bool isGeneratingReport;
         [ObservableProperty] private string reportStatus = "";

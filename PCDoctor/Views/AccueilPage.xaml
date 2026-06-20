@@ -128,31 +128,42 @@
             <ItemsControl ItemsSource="{Binding HealthChecks}" x:Name="PageRoot">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="svc:HealthCheck">
-                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                CornerRadius="8" Padding="16,12" Margin="0,0,0,8"
-                                BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                            <Grid ColumnSpacing="16">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                        <Button Padding="0" Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                IsEnabled="{x:Bind IsClickable}"
+                                Command="{Binding DataContext.GoToCheckCommand, ElementName=PageRoot}"
+                                CommandParameter="{x:Bind}"
+                                Style="{StaticResource TransparentButtonStyle}">
+                            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                    CornerRadius="8" Padding="16,12"
+                                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                                <Grid ColumnSpacing="16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <!-- Icône OK / KO -->
-                                <TextBlock Grid.Column="0" FontSize="20" VerticalAlignment="Center"
-                                           Text="{x:Bind Icon}"/>
+                                    <TextBlock Grid.Column="0" FontSize="20" VerticalAlignment="Center"
+                                               Text="{x:Bind Icon}"/>
 
-                                <StackPanel Grid.Column="1" Spacing="2">
-                                    <Grid>
-                                        <TextBlock Text="{x:Bind Label}" FontWeight="SemiBold"/>
-                                        <Border HorizontalAlignment="Right" CornerRadius="4" Padding="6,2"
-                                                Background="{ThemeResource SystemFillColorSolidNeutralBackgroundBrush}">
-                                            <TextBlock Text="{x:Bind Category}" FontSize="10" Opacity="0.7"/>
-                                        </Border>
-                                    </Grid>
-                                    <TextBlock Text="{x:Bind Advice}" Opacity="0.6" FontSize="12" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
+                                    <StackPanel Grid.Column="1" Spacing="2">
+                                        <Grid>
+                                            <TextBlock Text="{x:Bind Label}" FontWeight="SemiBold"/>
+                                            <Border HorizontalAlignment="Right" CornerRadius="4" Padding="6,2"
+                                                    Background="{ThemeResource SystemFillColorSolidNeutralBackgroundBrush}">
+                                                <TextBlock Text="{x:Bind Category}" FontSize="10" Opacity="0.7"/>
+                                            </Border>
+                                        </Grid>
+                                        <TextBlock Text="{x:Bind Advice}" Opacity="0.6" FontSize="12" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <!-- Flèche si cliquable -->
+                                    <FontIcon Grid.Column="2" Glyph="&#xE76C;" FontSize="12"
+                                              Opacity="{x:Bind ArrowOpacity}" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                        </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
