@@ -112,7 +112,11 @@ namespace PCDoctor.Services
 
             try
             {
-                d["Carte graphique"] = RunPs("Get-WmiObject Win32_VideoController | Select-Object -First 1 -ExpandProperty Name").Trim();
+                // Exclure les adaptateurs virtuels (Sunshine, parsec, VirtualBox, etc.)
+                d["Carte graphique"] = RunPs(
+                    "Get-WmiObject Win32_VideoController | " +
+                    "Where-Object { $_.Name -notmatch 'Virtual|Parsec|IddSample|sudoMaker|Mirror|Remote' } | " +
+                    "Select-Object -First 1 -ExpandProperty Name").Trim();
             }
             catch { }
 
