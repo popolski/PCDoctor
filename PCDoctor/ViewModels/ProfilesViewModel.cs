@@ -1,8 +1,11 @@
+using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using PCDoctor.Services;
 
 namespace PCDoctor.ViewModels
@@ -20,6 +23,45 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private string logText = "";
         [ObservableProperty] private string statusText = "";
 
+        private static readonly string ProfileFile = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "PCDoctor", "activeprofile.txt");
+
+        private string _activeProfile = "";
+        private string ActiveProfile
+        {
+            get => _activeProfile;
+            set
+            {
+                _activeProfile = value;
+                OnPropertyChanged(nameof(GamingButtonStyle));
+                OnPropertyChanged(nameof(PrivacyButtonStyle));
+                OnPropertyChanged(nameof(ProductivityButtonStyle));
+                OnPropertyChanged(nameof(BalancedButtonStyle));
+                SaveProfile(value);
+            }
+        }
+
+        // Retourne AccentButtonStyle si actif, null (= style par défaut) sinon
+        private static Style? Accent => Application.Current.Resources.TryGetValue(
+            "AccentButtonStyle", out var s) ? s as Style : null;
+
+        public Style? GamingButtonStyle       => _activeProfile == "Gaming"       ? Accent : null;
+        public Style? PrivacyButtonStyle      => _activeProfile == "Privacy"      ? Accent : null;
+        public Style? ProductivityButtonStyle => _activeProfile == "Productivity" ? Accent : null;
+        public Style? BalancedButtonStyle     => _activeProfile == "Balanced"     ? Accent : null;
+
+        private static void SaveProfile(string name)
+        {
+            try { Directory.CreateDirectory(Path.GetDirectoryName(ProfileFile)!); File.WriteAllText(ProfileFile, name); }
+            catch { }
+        }
+        private static string LoadProfile()
+        {
+            try { return File.Exists(ProfileFile) ? File.ReadAllText(ProfileFile).Trim() : ""; }
+            catch { return ""; }
+        }
+
         public bool CanApply => !IsApplying;
         partial void OnIsApplyingChanged(bool v) => OnPropertyChanged(nameof(CanApply));
 
@@ -27,9 +69,9 @@ namespace PCDoctor.ViewModels
         {
             _loading = true;
             SelectedPlan = _svc.GetActivePlanLabel();
-            // Masquer Ultimate si non disponible
             if (!_svc.IsUltimatePerfAvailable())
                 PowerPlanLabels.Remove("Performances optimales");
+            _activeProfile = LoadProfile();
             _loading = false;
         }
 
@@ -48,6 +90,7 @@ namespace PCDoctor.ViewModels
             var log = await Task.Run(() => _svc.ApplyGamingProfile());
             LogText = string.Join("\n", log);
             StatusText = "Profil Gaming appliqué.";
+            ActiveProfile = "Gaming";
             RefreshPlan();
             IsApplying = false;
         }
@@ -60,6 +103,7 @@ namespace PCDoctor.ViewModels
             var log = await Task.Run(() => _svc.ApplyPrivacyProfile());
             LogText = string.Join("\n", log);
             StatusText = "Profil Vie privée appliqué.";
+            ActiveProfile = "Privacy";
             IsApplying = false;
         }
 
@@ -71,6 +115,7 @@ namespace PCDoctor.ViewModels
             var log = await Task.Run(() => _svc.ApplyProductivityProfile());
             LogText = string.Join("\n", log);
             StatusText = "Profil Productivité appliqué.";
+            ActiveProfile = "Productivity";
             RefreshPlan();
             IsApplying = false;
         }
@@ -83,6 +128,7 @@ namespace PCDoctor.ViewModels
             var log = await Task.Run(() => _svc.ApplyBalancedProfile());
             LogText = string.Join("\n", log);
             StatusText = "Profil Équilibré appliqué.";
+            ActiveProfile = "Balanced";
             RefreshPlan();
             IsApplying = false;
         }

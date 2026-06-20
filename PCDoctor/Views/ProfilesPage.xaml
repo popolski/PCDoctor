@@ -59,7 +59,7 @@
                                 Command="{Binding ApplyGamingCommand}"
                                 IsEnabled="{Binding CanApply}"
                                 HorizontalAlignment="Stretch"
-                                Style="{StaticResource AccentButtonStyle}"/>
+                                Style="{Binding GamingButtonStyle}"/>
                     </StackPanel>
                 </Border>
 
@@ -76,7 +76,8 @@
                         <Button Content="Appliquer Vie privée"
                                 Command="{Binding ApplyPrivacyCommand}"
                                 IsEnabled="{Binding CanApply}"
-                                HorizontalAlignment="Stretch"/>
+                                HorizontalAlignment="Stretch"
+                                Style="{Binding PrivacyButtonStyle}"/>
                     </StackPanel>
                 </Border>
 
@@ -93,7 +94,8 @@
                         <Button Content="Appliquer Productivité"
                                 Command="{Binding ApplyProductivityCommand}"
                                 IsEnabled="{Binding CanApply}"
-                                HorizontalAlignment="Stretch"/>
+                                HorizontalAlignment="Stretch"
+                                Style="{Binding ProductivityButtonStyle}"/>
                     </StackPanel>
                 </Border>
 
@@ -110,7 +112,8 @@
                         <Button Content="Appliquer Équilibré"
                                 Command="{Binding ApplyBalancedCommand}"
                                 IsEnabled="{Binding CanApply}"
-                                HorizontalAlignment="Stretch"/>
+                                HorizontalAlignment="Stretch"
+                                Style="{Binding BalancedButtonStyle}"/>
                     </StackPanel>
                 </Border>
             </Grid>
