@@ -8,9 +8,30 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
-            <!-- Other app resources here -->
+
+            <!-- Style global pour les cartes (Border) -->
+            <Style x:Key="CardStyle" TargetType="Border">
+                <Setter Property="Background"    Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
+                <Setter Property="CornerRadius"  Value="8"/>
+                <Setter Property="Padding"       Value="20"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush"   Value="{ThemeResource CardStrokeColorDefaultBrush}"/>
+            </Style>
+
+            <!-- Titre de section coloré -->
+            <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+                <Setter Property="FontSize"     Value="18"/>
+                <Setter Property="FontWeight"   Value="SemiBold"/>
+                <Setter Property="Margin"       Value="0,12,0,0"/>
+                <Setter Property="Foreground"   Value="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+            </Style>
+
+            <!-- Tooltip standard -->
+            <Style x:Key="ToggleTooltipStyle" TargetType="ToolTip">
+                <Setter Property="MaxWidth" Value="280"/>
+            </Style>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

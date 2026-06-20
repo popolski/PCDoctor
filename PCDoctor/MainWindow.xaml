@@ -16,65 +16,125 @@
             IsBackButtonVisible="Collapsed"
             IsSettingsVisible="True"
             SelectionChanged="NavView_SelectionChanged"
-            Loaded="NavView_Loaded">
+            Loaded="NavView_Loaded"
+            PaneTitle="PCDoctor"
+            OpenPaneLength="220">
 
             <NavigationView.MenuItems>
 
-                <NavigationViewItem Content="Accueil" Tag="AccueilPage">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE80F;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-
-                <NavigationViewItem Content="Profils &amp; Plans" Tag="ProfilesPage">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE728;"/>
-                    </NavigationViewItem.Icon>
+                <!-- Accueil -->
+                <NavigationViewItem Content="Accueil" Tag="AccueilPage" x:Name="NavAccueil">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE80F;"/></NavigationViewItem.Icon>
                 </NavigationViewItem>
 
                 <NavigationViewItemSeparator/>
 
-                <NavigationViewItem Content="Diagnostic" Icon="Find">
+                <!-- Sécurité -->
+                <NavigationViewItem Content="Sécurité" Tag="_Securite">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE72E;"/></NavigationViewItem.Icon>
                     <NavigationViewItem.MenuItems>
-                        <NavigationViewItem Content="Audits" Tag="AuditsPage"/>
-                        <NavigationViewItem Content="État système" Tag="EtatPage"/>
-                        <NavigationViewItem Content="Applications" Tag="AppsPage"/>
-                        <NavigationViewItem Content="Démarrage" Tag="StartupPage"/>
+                        <NavigationViewItem Content="Hardening"      Tag="HardeningPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE83D;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Confidentialité" Tag="PrivacyPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE8A5;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Réseau"         Tag="NetworkPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE968;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
 
-                <NavigationViewItem Content="Optimisation" Icon="Repair">
+                <!-- Performances -->
+                <NavigationViewItem Content="Performances" Tag="_Performances">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xEC4A;"/></NavigationViewItem.Icon>
                     <NavigationViewItem.MenuItems>
-                        <NavigationViewItem Content="Nettoyage" Tag="NettoyagePage"/>
-                        <NavigationViewItem Content="Optimisations" Tag="OptimPage"/>
-                        <NavigationViewItem Content="Gaming" Tag="GamingPage"/>
-                        <NavigationViewItem Content="Bloatware" Tag="BloatwarePage"/>
-                        <NavigationViewItem Content="Services fantômes" Tag="GhostServicesPage"/>
-                        <NavigationViewItem Content="Explorateur Windows" Tag="ExplorerPage"/>
+                        <NavigationViewItem Content="Optimisations"      Tag="OptimPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE945;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Gaming"             Tag="GamingPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE7FC;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Profils &amp; Plans" Tag="ProfilesPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE728;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Explorateur Windows" Tag="ExplorerPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xEC50;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Démarrage"          Tag="StartupPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE7E8;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
 
-                <NavigationViewItem Content="Sécurité &amp; Vie privée" Icon="Permissions">
+                <!-- Nettoyage -->
+                <NavigationViewItem Content="Nettoyage" Tag="_Nettoyage">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xEA99;"/></NavigationViewItem.Icon>
                     <NavigationViewItem.MenuItems>
-                        <NavigationViewItem Content="Hardening" Tag="HardeningPage"/>
-                        <NavigationViewItem Content="Confidentialité" Tag="PrivacyPage"/>
-                        <NavigationViewItem Content="Réseau" Tag="NetworkPage"/>
+                        <NavigationViewItem Content="Nettoyage"         Tag="NettoyagePage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE74D;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Bloatware"         Tag="BloatwarePage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE8BB;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Applications"      Tag="AppsPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE71D;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Services fantômes" Tag="GhostServicesPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE81B;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
 
-                <NavigationViewItem Content="Maintenance" Icon="Setting">
+                <!-- Diagnostic -->
+                <NavigationViewItem Content="Diagnostic" Tag="_Diagnostic">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE9D9;"/></NavigationViewItem.Icon>
                     <NavigationViewItem.MenuItems>
-                        <NavigationViewItem Content="Mises à jour Windows" Tag="UpdatesPage"/>
-                        <NavigationViewItem Content="Pilotes" Tag="DriversPage"/>
-                        <NavigationViewItem Content="Planificateur" Tag="PlanificateurPage"/>
-                        <NavigationViewItem Content="Paquets (Winget)" Tag="WingetPage"/>
-                        <NavigationViewItem Content="Outils système" Tag="SystemToolsPage"/>
+                        <NavigationViewItem Content="Audits"       Tag="AuditsPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE9F9;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="État système" Tag="EtatPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE7F4;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                    </NavigationViewItem.MenuItems>
+                </NavigationViewItem>
+
+                <!-- Maintenance -->
+                <NavigationViewItem Content="Maintenance" Tag="_Maintenance">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE90F;"/></NavigationViewItem.Icon>
+                    <NavigationViewItem.MenuItems>
+                        <NavigationViewItem Content="Mises à jour Windows" Tag="UpdatesPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE895;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Pilotes"             Tag="DriversPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE9D2;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Planificateur"       Tag="PlanificateurPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE823;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Paquets (Winget)"    Tag="WingetPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE896;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Outils système"      Tag="SystemToolsPage">
+                            <NavigationViewItem.Icon><FontIcon Glyph="&#xE8B8;"/></NavigationViewItem.Icon>
+                        </NavigationViewItem>
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
 
             </NavigationView.MenuItems>
 
-            <Frame x:Name="ContentFrame"/>
+            <!-- Transitions de page -->
+            <Frame x:Name="ContentFrame">
+                <Frame.ContentTransitions>
+                    <TransitionCollection>
+                        <NavigationThemeTransition>
+                            <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                                <EntranceNavigationTransitionInfo/>
+                            </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                        </NavigationThemeTransition>
+                    </TransitionCollection>
+                </Frame.ContentTransitions>
+            </Frame>
 
         </NavigationView>
     </Grid>

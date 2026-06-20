@@ -106,7 +106,7 @@
             </Border>
 
             <!-- Wi-Fi Sense + Apps arrière-plan -->
-            <TextBlock Text="Réseau &amp; Applications" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+            <TextBlock Text="Réseau &amp; Applications" Style="{StaticResource SectionTitleStyle}"/>
 
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
                     BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
@@ -133,7 +133,7 @@
             </Border>
 
             <!-- Recall + Localisation -->
-            <TextBlock Text="Surveillance &amp; Localisation" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+            <TextBlock Text="Surveillance &amp; Localisation" Style="{StaticResource SectionTitleStyle}"/>
 
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
                     BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
@@ -163,7 +163,7 @@
             </Border>
 
             <!-- Séparateur IA / Copilot -->
-            <TextBlock Text="Intelligence artificielle" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+            <TextBlock Text="Intelligence artificielle" Style="{StaticResource SectionTitleStyle}"/>
 
             <!-- Copilot -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"

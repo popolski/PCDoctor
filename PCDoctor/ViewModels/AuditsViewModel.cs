@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
+using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PCDoctor.Services;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace PCDoctor.ViewModels
 {
@@ -39,6 +41,21 @@ namespace PCDoctor.ViewModels
             var res = await Task.Run(work);
             Apply(res);
             IsBusy = false;
+        }
+
+        [RelayCommand]
+        private void CopyResults()
+        {
+            if (Rows.Count == 0) return;
+            var sb = new StringBuilder();
+            sb.AppendLine(CurrentTitle);
+            sb.AppendLine(CurrentSubtitle);
+            sb.AppendLine(new string('-', 60));
+            foreach (var r in Rows)
+                sb.AppendLine($"{r.Col1}\t{r.Col2}\t{r.Col3}\t{r.Col4}".TrimEnd());
+            var pkg = new DataPackage();
+            pkg.SetText(sb.ToString());
+            Clipboard.SetContent(pkg);
         }
 
         private void Apply(AuditResult res)

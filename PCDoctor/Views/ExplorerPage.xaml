@@ -16,7 +16,7 @@
             </TextBlock>
 
             <!-- Affichage -->
-            <TextBlock Text="Affichage" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+            <TextBlock Text="Affichage" Style="{StaticResource SectionTitleStyle}"/>
 
             <!-- Extensions -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
@@ -84,7 +84,7 @@
             </Border>
 
             <!-- Ergonomie -->
-            <TextBlock Text="Ergonomie" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+            <TextBlock Text="Ergonomie" Style="{StaticResource SectionTitleStyle}"/>
 
             <!-- Fin de tâche -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"

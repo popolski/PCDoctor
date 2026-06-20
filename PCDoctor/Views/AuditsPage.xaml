@@ -39,11 +39,16 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Spacing="4">
-                <TextBlock Text="{Binding CurrentTitle}" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding CurrentSubtitle}" Opacity="0.7"/>
-                <ProgressBar IsIndeterminate="{Binding IsBusy}" Margin="0,4,0,0"/>
-            </StackPanel>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="{Binding CurrentTitle}" FontSize="20" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding CurrentSubtitle}" Opacity="0.7"/>
+                    <ProgressBar IsIndeterminate="{Binding IsBusy}" Margin="0,4,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="Copier" Command="{Binding CopyResultsCommand}"
+                        VerticalAlignment="Top" IsEnabled="{Binding CanRun}"/>
+            </Grid>
 
             <controls:DataGrid Grid.Row="1"
                 ItemsSource="{Binding Rows}"

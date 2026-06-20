@@ -56,7 +56,7 @@
             </Border>
 
             <!-- mDNS / Bonjour -->
-            <TextBlock Text="Protocoles réseau" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+            <TextBlock Text="Protocoles réseau" Style="{StaticResource SectionTitleStyle}"/>
 
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
                     BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
@@ -86,7 +86,7 @@
             </Border>
 
             <!-- Defender -->
-            <TextBlock Text="Windows Defender" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+            <TextBlock Text="Windows Defender" Style="{StaticResource SectionTitleStyle}"/>
 
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
                     BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
@@ -115,7 +115,7 @@
             </Border>
 
             <!-- BitLocker -->
-            <TextBlock Text="BitLocker" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+            <TextBlock Text="BitLocker" Style="{StaticResource SectionTitleStyle}"/>
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
                     BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                 <StackPanel Spacing="10">
@@ -147,7 +147,7 @@
             </Border>
 
             <!-- ASR Rules -->
-            <TextBlock Text="Règles ASR (Attack Surface Reduction)" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+            <TextBlock Text="Règles ASR (Attack Surface Reduction)" Style="{StaticResource SectionTitleStyle}"/>
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
                     BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                 <StackPanel Spacing="10">
@@ -177,7 +177,7 @@
             </Border>
 
             <!-- Exploit Protection -->
-            <TextBlock Text="Exploit Protection" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" Opacity="0.85"/>
+            <TextBlock Text="Exploit Protection" Style="{StaticResource SectionTitleStyle}"/>
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
                     BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                 <Grid>

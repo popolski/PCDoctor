@@ -94,6 +94,7 @@ namespace PCDoctor.ViewModels
                 ? "Toutes les recommandations sont appliquées."
                 : $"{checks.Count - ok} recommandation(s) en attente.";
             HealthLoading = false;
+            AppState.NotifyScore(ok, checks.Count);
         }
     }
 }
