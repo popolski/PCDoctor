@@ -38,12 +38,7 @@ namespace PCDoctor
 
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {
-            // Restaurer la derniere page visitee
-            string lastTag = LoadLastPage();
-            if (!string.IsNullOrEmpty(lastTag))
-                SelectItemByTag(lastTag);
-            else
-                NavView.SelectedItem = NavView.MenuItems[0];
+            NavView.SelectedItem = NavView.MenuItems[0];
         }
 
         private void NavView_SelectionChanged(NavigationView sender,
