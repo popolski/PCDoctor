@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.Json;
+using System.Management;
 
 namespace PCDoctor.Services
 {
@@ -30,80 +30,76 @@ namespace PCDoctor.Services
     {
         private const string LlmnrKey = @"SOFTWARE\Policies\Microsoft\Windows NT\DNSClient";
 
-        // ─── LLMNR ─── (active = EnableMulticast absent ou !=0 ; sécurisé = 0)
+        // ─── LLMNR ───
         public bool IsLlmnrActive()
         {
             var v = RegistryHelper.GetDword(LlmnrKey, "EnableMulticast");
-            return v != 0; // null (absent) ou !=0 => actif
+            return v != 0;
         }
-
         public void SetLlmnr(bool active)
         {
             if (active)
-                RegistryHelper.DeleteValueHklm(LlmnrKey, "EnableMulticast"); // retour défaut = actif
+                RegistryHelper.DeleteValueHklm(LlmnrKey, "EnableMulticast");
             else
-                RegistryHelper.SetDwordHklm(LlmnrKey, "EnableMulticast", 0); // 0 = désactivé (sécurisé)
+                RegistryHelper.SetDwordHklm(LlmnrKey, "EnableMulticast", 0);
         }
 
-        // ─── SMBv1 ─── via DISM (feature Windows). On lance la commande.
+        // ─── SMBv1 ─── via dism.exe
         public bool IsSmb1Active()
         {
             try
             {
-                var psi = new ProcessStartInfo("powershell",
-                    "-NoProfile -Command \"(Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol).State\"")
-                { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
-                using var p = Process.Start(psi);
-                string outp = p!.StandardOutput.ReadToEnd();
-                p.WaitForExit();
-                return outp.Trim().Equals("Enabled", StringComparison.OrdinalIgnoreCase);
+                string output = RunExe("dism.exe", "/Online /Get-FeatureInfo /FeatureName:SMB1Protocol");
+                return output.Contains("State : Enabled", StringComparison.OrdinalIgnoreCase);
             }
             catch { return false; }
         }
-
         public void SetSmb1(bool active)
         {
-            string verb = active ? "Enable" : "Disable";
-            var psi = new ProcessStartInfo("powershell",
-                $"-NoProfile -Command \"{verb}-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart\"")
-            { UseShellExecute = false, CreateNoWindow = true };
-            using var p = Process.Start(psi);
-            p!.WaitForExit();
+            string verb = active ? "/Enable-Feature" : "/Disable-Feature";
+            RunExeNoOutput("dism.exe", $"/Online {verb} /FeatureName:SMB1Protocol /NoRestart");
         }
 
-        // ─── BitLocker ───────────────────────────────────────────────────────
+        // ─── BitLocker ─── via WMI Win32_EncryptableVolume
         public List<BitLockerDrive> GetBitLockerStatus()
         {
             var list = new List<BitLockerDrive>();
             try
             {
-                var psi = new ProcessStartInfo("powershell",
-                    "-NoProfile -Command \"Get-BitLockerVolume | Select-Object MountPoint,VolumeStatus,EncryptionMethod,ProtectionStatus | ConvertTo-Json -Compress\"")
-                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
-                using var p = Process.Start(psi)!;
-                string json = p.StandardOutput.ReadToEnd().Trim();
-                p.WaitForExit();
-                if (string.IsNullOrEmpty(json)) return list;
-
-                // Peut retourner un objet ou un tableau
-                if (!json.StartsWith("[")) json = $"[{json}]";
-                using var doc = JsonDocument.Parse(json);
-                foreach (var el in doc.RootElement.EnumerateArray())
+                var scope = new ManagementScope(@"\\.\ROOT\CIMV2\Security\MicrosoftVolumeEncryption");
+                scope.Connect();
+                using var searcher = new ManagementObjectSearcher(scope,
+                    new ObjectQuery("SELECT DriveLetter, ProtectionStatus, ConversionStatus, EncryptionMethod FROM Win32_EncryptableVolume"));
+                foreach (ManagementObject obj in searcher.Get())
                 {
-                    list.Add(new BitLockerDrive(
-                        el.GetProperty("MountPoint").GetString() ?? "?",
-                        el.GetProperty("VolumeStatus").GetString() ?? "?",
-                        el.GetProperty("EncryptionMethod").GetString() ?? "?",
-                        el.GetProperty("ProtectionStatus").GetString() == "On"
-                    ));
+                    string drive  = obj["DriveLetter"]?.ToString() ?? "?";
+                    uint   prot   = (uint)(obj["ProtectionStatus"] ?? 0u);
+                    uint   conv   = (uint)(obj["ConversionStatus"] ?? 0u);
+                    uint   method = (uint)(obj["EncryptionMethod"]  ?? 0u);
+                    list.Add(new BitLockerDrive(drive, ConversionStatusLabel(conv), EncMethodLabel(method), prot == 1));
                 }
             }
             catch (Exception e) { Logger.Warn($"GetBitLockerStatus : {e.Message}"); }
             return list;
         }
 
-        // ─── ASR Rules (Attack Surface Reduction) ────────────────────────────
+        private static string ConversionStatusLabel(uint s) => s switch
+        {
+            0 => "Non chiffré",
+            1 => "Chiffré",
+            2 => "Chiffrement en cours",
+            3 => "Déchiffrement en cours",
+            _ => "État inconnu"
+        };
+        private static string EncMethodLabel(uint m) => m switch
+        {
+            3 => "AES-128", 4 => "AES-256",
+            6 => "XTS-AES-128", 7 => "XTS-AES-256",
+            0 => "Aucun",
+            _ => $"Méthode {m}"
+        };
 
+        // ─── ASR Rules ─── via WMI MSFT_MpPreference
         private static readonly (string Name, string Guid)[] AsrRuleDefs =
         {
             ("Blocage des macros Office depuis Win32",          "92E97FA1-2EDF-4476-BDD6-9DD0B4DDDC7B"),
@@ -119,50 +115,46 @@ namespace PCDoctor.Services
         public List<AsrRule> GetAsrRules()
         {
             var list = new List<AsrRule>();
+            var enabled = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             try
             {
-                var psi = new ProcessStartInfo("powershell",
-                    "-NoProfile -Command \"(Get-MpPreference).AttackSurfaceReductionRules_Ids | ConvertTo-Json -Compress\"")
-                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
-                using var p = Process.Start(psi)!;
-                string json = p.StandardOutput.ReadToEnd().Trim();
-                p.WaitForExit();
-
-                var enabledGuids = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                if (!string.IsNullOrEmpty(json) && json != "null")
+                var scope = DefenderScope();
+                using var searcher = new ManagementObjectSearcher(scope,
+                    new ObjectQuery("SELECT AttackSurfaceReductionRules_Ids FROM MSFT_MpPreference"));
+                foreach (ManagementObject obj in searcher.Get())
                 {
-                    if (!json.StartsWith("[")) json = $"[{json}]";
-                    using var doc = JsonDocument.Parse(json);
-                    foreach (var el in doc.RootElement.EnumerateArray())
-                        enabledGuids.Add(el.GetString() ?? "");
+                    if (obj["AttackSurfaceReductionRules_Ids"] is string[] ids)
+                        foreach (var id in ids) enabled.Add(id);
                 }
-
-                foreach (var (name, guid) in AsrRuleDefs)
-                    list.Add(new AsrRule(name, guid, enabledGuids.Contains(guid)));
-
             }
             catch (Exception e) { Logger.Warn($"GetAsrRules : {e.Message}"); }
+            foreach (var (name, guid) in AsrRuleDefs)
+                list.Add(new AsrRule(name, guid, enabled.Contains(guid)));
             return list;
         }
 
         public void SetAsrRule(string guid, bool enable)
         {
-            string action = enable ? "Enabled" : "Disabled";
-            var psi = new ProcessStartInfo("powershell",
-                $"-NoProfile -Command \"Add-MpPreference -AttackSurfaceReductionRules_Ids '{guid}' -AttackSurfaceReductionRules_Actions {action}\"")
-            { UseShellExecute = false, CreateNoWindow = true };
-            using var p = Process.Start(psi)!;
-            p.WaitForExit();
-            Logger.Action($"ASR rule {guid} : {action}");
+            try
+            {
+                var scope = DefenderScope();
+                using var cls = new ManagementClass(scope, new ManagementPath("MSFT_MpPreference"), null);
+                var inParams = cls.GetMethodParameters("Add");
+                inParams["AttackSurfaceReductionRules_Ids"]     = new[] { guid };
+                inParams["AttackSurfaceReductionRules_Actions"] = new[] { enable ? 1u : 0u };
+                cls.InvokeMethod("Add", inParams, null);
+                Logger.Action($"ASR rule {guid} : {(enable ? "activée" : "désactivée")}");
+            }
+            catch (Exception e) { Logger.Warn($"SetAsrRule : {e.Message}"); }
         }
 
         public void EnableAllAsrRules()
         {
             foreach (var (_, guid) in AsrRuleDefs) SetAsrRule(guid, true);
-            Logger.Action("Toutes les regles ASR activees");
+            Logger.Action("Toutes les règles ASR activées");
         }
 
-        // ─── Exploit Protection ───────────────────────────────────────────────
+        // ─── Exploit Protection ─── (PowerShell maintenu : bits de mitigation complexes)
         public record ExploitProtectionStatus(bool DepEnabled, bool AslrEnabled, bool SeheEnabled);
 
         public ExploitProtectionStatus GetExploitProtection()
@@ -176,48 +168,37 @@ namespace PCDoctor.Services
                 string o = p.StandardOutput.ReadToEnd().Trim();
                 p.WaitForExit();
                 var parts = o.Split('|');
-                bool dep  = parts.Length > 0 && parts[0].Trim().Equals("ON", StringComparison.OrdinalIgnoreCase);
-                bool aslr = parts.Length > 1 && parts[1].Trim().Equals("ON", StringComparison.OrdinalIgnoreCase);
-                bool seh  = parts.Length > 2 && parts[2].Trim().Equals("ON", StringComparison.OrdinalIgnoreCase);
-                return new ExploitProtectionStatus(dep, aslr, seh);
+                return new ExploitProtectionStatus(
+                    parts.Length > 0 && parts[0].Trim().Equals("ON", StringComparison.OrdinalIgnoreCase),
+                    parts.Length > 1 && parts[1].Trim().Equals("ON", StringComparison.OrdinalIgnoreCase),
+                    parts.Length > 2 && parts[2].Trim().Equals("ON", StringComparison.OrdinalIgnoreCase));
             }
             catch { return new ExploitProtectionStatus(false, false, false); }
         }
 
         public void SetExploitProtection(bool enable)
         {
-            // Active les protections systeme via Set-ProcessMitigation
-            string state = enable ? "ON" : "OFF";
+            string flags = "DEP,ForceRelocateImages,SEHOP";
+            string verb  = enable ? "Enable" : "Disable";
             var psi = new ProcessStartInfo("powershell",
-                $"-NoProfile -Command \"Set-ProcessMitigation -System -Enable DEP,ForceRelocateImages,SEHOP\"")
+                $"-NoProfile -Command \"Set-ProcessMitigation -System -{verb} {flags}\"")
             { UseShellExecute = false, CreateNoWindow = true };
-            if (!enable)
-                psi = new ProcessStartInfo("powershell",
-                    "-NoProfile -Command \"Set-ProcessMitigation -System -Disable DEP,ForceRelocateImages,SEHOP\"")
-                { UseShellExecute = false, CreateNoWindow = true };
             using var p = Process.Start(psi)!;
             p.WaitForExit();
-            Logger.Action($"Exploit Protection systeme : {state}");
+            Logger.Action($"Exploit Protection système : {(enable ? "activée" : "désactivée")}");
         }
 
         // ─── mDNS / Bonjour ───
-        // mDNS Windows integre : HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters\EnableMDNS
-        // 0 = desactive, 1 (ou absent) = actif
-        // Bonjour Apple : service "Bonjour Service" (mDNSResponder)
         public bool IsMdnsActive()
         {
             var v = RegistryHelper.GetDword(@"SYSTEM\CurrentControlSet\Services\Dnscache\Parameters", "EnableMDNS");
-            return v != 0; // absent ou 1 = actif
+            return v != 0;
         }
         public bool IsBonjourInstalled()
         {
             try
             {
-                var psi = new ProcessStartInfo("sc.exe", "query \"Bonjour Service\"")
-                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
-                using var p = Process.Start(psi)!;
-                string o = p.StandardOutput.ReadToEnd();
-                p.WaitForExit();
+                string o = RunExe("sc.exe", "query \"Bonjour Service\"");
                 return o.Contains("Bonjour", StringComparison.OrdinalIgnoreCase);
             }
             catch { return false; }
@@ -228,72 +209,66 @@ namespace PCDoctor.Services
                 RegistryHelper.DeleteValueHklm(@"SYSTEM\CurrentControlSet\Services\Dnscache\Parameters", "EnableMDNS");
             else
                 RegistryHelper.SetDwordHklm(@"SYSTEM\CurrentControlSet\Services\Dnscache\Parameters", "EnableMDNS", 0);
-            Logger.Action($"mDNS Windows {(active ? "reactivé" : "desactive")}");
+            Logger.Action($"mDNS Windows {(active ? "réactivé" : "désactivé")}");
         }
         public string DisableBonjour()
         {
             try
             {
-                var psi = new ProcessStartInfo("sc.exe", "stop \"Bonjour Service\"")
-                { UseShellExecute = false, CreateNoWindow = true };
-                using var p1 = Process.Start(psi)!;
-                p1.WaitForExit();
-
-                var psi2 = new ProcessStartInfo("sc.exe", "config \"Bonjour Service\" start= disabled")
-                { UseShellExecute = false, CreateNoWindow = true };
-                using var p2 = Process.Start(psi2)!;
-                p2.WaitForExit();
-
-                Logger.Action("Service Bonjour desactive");
-                return "Service Bonjour desactive (arrete et demarrage mis a Desactive).";
+                RunExeNoOutput("sc.exe", "stop \"Bonjour Service\"");
+                RunExeNoOutput("sc.exe", "config \"Bonjour Service\" start= disabled");
+                Logger.Action("Service Bonjour désactivé");
+                return "Service Bonjour désactivé (arrêté et démarrage mis à Désactivé).";
             }
             catch (Exception e) { return $"Erreur : {e.Message}"; }
         }
 
-        // ─── Defender : informations signatures ───
+        // ─── Defender : signatures ─── via WMI MSFT_MpComputerStatus
         public (string version, string date) GetDefenderSignatureInfo()
         {
             try
             {
-                var psi = new ProcessStartInfo("powershell",
-                    "-NoProfile -Command \"$s = Get-MpComputerStatus; '{0}|{1}' -f $s.AntivirusSignatureVersion,$s.AntivirusSignatureLastUpdated\"")
-                { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
-                using var p = Process.Start(psi)!;
-                string o = p.StandardOutput.ReadToEnd().Trim();
-                p.WaitForExit();
-                var parts = o.Split('|');
-                string ver  = parts.Length > 0 ? parts[0].Trim() : "?";
-                string date = parts.Length > 1 ? parts[1].Trim() : "?";
-                // date est au format ISO -> on tente de la formater
-                if (DateTime.TryParse(date, out var dt))
-                    date = dt.ToString("dd/MM/yyyy HH:mm");
-                return (ver, date);
+                var scope = DefenderScope();
+                using var searcher = new ManagementObjectSearcher(scope,
+                    new ObjectQuery("SELECT AntivirusSignatureVersion, AntivirusSignatureLastUpdated FROM MSFT_MpComputerStatus"));
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    string ver  = obj["AntivirusSignatureVersion"]?.ToString() ?? "?";
+                    string raw  = obj["AntivirusSignatureLastUpdated"]?.ToString() ?? "";
+                    string date = "?";
+                    if (!string.IsNullOrEmpty(raw))
+                        try { date = ManagementDateTimeConverter.ToDateTime(raw).ToString("dd/MM/yyyy HH:mm"); }
+                        catch { date = raw; }
+                    return (ver, date);
+                }
             }
-            catch { return ("?", "?"); }
+            catch (Exception e) { Logger.Warn($"GetDefenderSignatureInfo : {e.Message}"); }
+            return ("?", "?");
         }
 
-        // Lance une MAJ des signatures Defender
         public string UpdateDefenderSignatures()
         {
             try
             {
-                var psi = new ProcessStartInfo("powershell",
-                    "-NoProfile -Command \"Update-MpSignature\"")
-                { UseShellExecute = false, CreateNoWindow = true };
+                string mpCmd = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                    "Windows Defender", "MpCmdRun.exe");
+                var psi = new ProcessStartInfo(mpCmd, "-SignatureUpdate")
+                    { UseShellExecute = false, CreateNoWindow = true };
                 using var p = Process.Start(psi)!;
                 p.WaitForExit();
                 Logger.Action("Signatures Defender mises à jour");
                 if (p.ExitCode == 0)
                 {
                     var (ver, date) = GetDefenderSignatureInfo();
-                    return $"Signatures mises à jour - v{ver} ({date})";
+                    return $"Signatures mises à jour — v{ver} ({date})";
                 }
                 return $"Mise à jour terminée avec le code {p.ExitCode}.";
             }
             catch (Exception e) { return $"Erreur : {e.Message}"; }
         }
 
-        // Lance un scan rapide Defender via MpCmdRun.exe (plus fiable que Start-MpScan en session PS non-interactive)
+        // ─── Scan rapide Defender ─── via MpCmdRun.exe
         public string StartQuickScan()
         {
             try
@@ -301,9 +276,8 @@ namespace PCDoctor.Services
                 string mpCmd = System.IO.Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
                     "Windows Defender", "MpCmdRun.exe");
-
                 var psi = new ProcessStartInfo(mpCmd, "-Scan -ScanType 1")
-                { UseShellExecute = false, CreateNoWindow = true };
+                    { UseShellExecute = false, CreateNoWindow = true };
                 using var p = Process.Start(psi)!;
                 p.WaitForExit();
                 Logger.Action("Scan rapide Defender lancé (MpCmdRun)");
@@ -314,30 +288,58 @@ namespace PCDoctor.Services
             catch (Exception e) { return $"Erreur : {e.Message}"; }
         }
 
-        // ─── SmartScreen / PUA Protection ─── via Defender
+        // ─── PUA Protection ─── via WMI MSFT_MpPreference
         public bool IsPuaActive()
         {
             try
             {
-                var psi = new ProcessStartInfo("powershell",
-                    "-NoProfile -Command \"(Get-MpPreference).PUAProtection\"")
-                { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
-                using var p = Process.Start(psi);
-                string outp = p!.StandardOutput.ReadToEnd();
-                p.WaitForExit();
-                return outp.Trim() == "1";
+                var scope = DefenderScope();
+                using var searcher = new ManagementObjectSearcher(scope,
+                    new ObjectQuery("SELECT PUAProtection FROM MSFT_MpPreference"));
+                foreach (ManagementObject obj in searcher.Get())
+                    return (uint)(obj["PUAProtection"] ?? 0u) == 1u;
             }
-            catch { return false; }
+            catch (Exception e) { Logger.Warn($"IsPuaActive : {e.Message}"); }
+            return false;
         }
 
         public void SetPua(bool active)
         {
-            string val = active ? "Enabled" : "Disabled";
-            var psi = new ProcessStartInfo("powershell",
-                $"-NoProfile -Command \"Set-MpPreference -PUAProtection {val}\"")
-            { UseShellExecute = false, CreateNoWindow = true };
+            try
+            {
+                var scope = DefenderScope();
+                using var cls = new ManagementClass(scope, new ManagementPath("MSFT_MpPreference"), null);
+                var inParams = cls.GetMethodParameters("Set");
+                inParams["PUAProtection"] = active ? 1u : 0u;
+                cls.InvokeMethod("Set", inParams, null);
+            }
+            catch (Exception e) { Logger.Warn($"SetPua : {e.Message}"); }
+        }
+
+        // ─── Helpers ─────────────────────────────────────────────────────────
+        private static ManagementScope DefenderScope()
+        {
+            var scope = new ManagementScope(@"\\.\ROOT\Microsoft\Windows\Defender");
+            scope.Connect();
+            return scope;
+        }
+
+        private static string RunExe(string exe, string args)
+        {
+            var psi = new ProcessStartInfo(exe, args)
+                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
+            using var p = Process.Start(psi)!;
+            string o = p.StandardOutput.ReadToEnd();
+            p.WaitForExit();
+            return o;
+        }
+
+        private static void RunExeNoOutput(string exe, string args)
+        {
+            var psi = new ProcessStartInfo(exe, args)
+                { UseShellExecute = false, CreateNoWindow = true };
             using var p = Process.Start(psi);
-            p!.WaitForExit();
+            p?.WaitForExit();
         }
     }
 }
