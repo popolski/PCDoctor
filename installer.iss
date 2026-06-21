@@ -1,5 +1,5 @@
 #define MyAppName "PCDoctor"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.1"
 #define MyAppPublisher "Hugues Dubois"
 #define MyAppExeName "PCDoctor.exe"
 #define MyAppIcon "PCDoctor\Assets\pcdoctor.ico"

@@ -13,7 +13,7 @@ namespace PCDoctor.Services
 
     public class UpdateCheckService
     {
-        private const string CurrentVersion = "0.9"; // TEST ONLY — remettre "1.0" après
+        private const string CurrentVersion = "1.1";
         private const string ApiUrl = "https://api.github.com/repos/popolski/PCDoctor/releases/latest";
 
         public async Task<(UpdateInfo? Info, string? Error)> CheckAsync()

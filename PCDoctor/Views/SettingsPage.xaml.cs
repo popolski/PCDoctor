@@ -22,7 +22,7 @@ namespace PCDoctor.Views
 
         private void SettingsPage_Loaded(object sender, RoutedEventArgs e)
         {
-            VersionText.Text = "Version 1.0 — édition WinUI";
+            VersionText.Text = "Version 1.1 — édition WinUI";
 
             var id = WindowsIdentity.GetCurrent();
             var principal = new WindowsPrincipal(id);
