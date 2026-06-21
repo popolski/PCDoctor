@@ -35,36 +35,64 @@ namespace PCDoctor.Services
         // Scan : recherche par mot-clé dans les emplacements typiques
         public List<ResiduItem> Scan(string keyword)
         {
-            var result = new List<ResiduItem>();
+            var result  = new List<ResiduItem>();
+            var seen    = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (string.IsNullOrWhiteSpace(keyword)) return result;
 
-            // Dossiers
+            // Dossiers — niveau 1 direct + niveau 2 (publisher\appname)
             foreach (var root in FolderRoots)
             {
                 if (!Directory.Exists(root)) continue;
+                ScanFolderLevel(root, keyword, seen, result);
+
+                // Un niveau supplémentaire : cherche dans chaque sous-dossier de root
                 try
                 {
-                    foreach (var dir in Directory.GetDirectories(root, $"*{keyword}*", SearchOption.TopDirectoryOnly))
+                    foreach (var sub in Directory.GetDirectories(root, "*", SearchOption.TopDirectoryOnly))
                     {
-                        if (SafetyGuard.IsProtectedResidu(dir)) continue;
-                        result.Add(new ResiduItem
-                        {
-                            Path    = dir,
-                            Type    = ResiduType.Folder,
-                            SizeStr = GetFolderSizeStr(dir)
-                        });
+                        ScanFolderLevel(sub, keyword, seen, result);
                     }
                 }
                 catch { }
             }
 
-            // Registre
-            ScanRegHive("HKLM", Registry.LocalMachine, @"SOFTWARE",                keyword, result);
-            ScanRegHive("HKLM", Registry.LocalMachine, @"SOFTWARE\WOW6432Node",    keyword, result);
-            ScanRegHive("HKCU", Registry.CurrentUser,  @"SOFTWARE",                keyword, result);
+            // Registre — SOFTWARE (sous-clés directes)
+            ScanRegHive("HKLM", Registry.LocalMachine, @"SOFTWARE",                         keyword, result);
+            ScanRegHive("HKLM", Registry.LocalMachine, @"SOFTWARE\WOW6432Node",             keyword, result);
+            ScanRegHive("HKCU", Registry.CurrentUser,  @"SOFTWARE",                         keyword, result);
+
+            // Registre — clés Uninstall (résidus très courants)
+            ScanRegHive("HKLM", Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",             keyword, result);
+            ScanRegHive("HKLM", Registry.LocalMachine, @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall", keyword, result);
+            ScanRegHive("HKCU", Registry.CurrentUser,  @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",             keyword, result);
+
+            // Registre — Run / RunOnce
+            ScanRegValues("HKLM", Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run",     keyword, result);
+            ScanRegValues("HKCU", Registry.CurrentUser,  @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run",     keyword, result);
 
             Logger.Info($"Résidus '{keyword}' : {result.Count} élément(s) trouvé(s)");
             return result;
+        }
+
+        private static void ScanFolderLevel(string root, string keyword,
+            HashSet<string> seen, List<ResiduItem> result)
+        {
+            if (!Directory.Exists(root)) return;
+            try
+            {
+                foreach (var dir in Directory.GetDirectories(root, $"*{keyword}*", SearchOption.TopDirectoryOnly))
+                {
+                    if (!seen.Add(dir)) continue;
+                    if (SafetyGuard.IsProtectedResidu(dir)) continue;
+                    result.Add(new ResiduItem
+                    {
+                        Path    = dir,
+                        Type    = ResiduType.Folder,
+                        SizeStr = GetFolderSizeStr(dir)
+                    });
+                }
+            }
+            catch { }
         }
 
         // Suppression des éléments sélectionnés
@@ -121,6 +149,34 @@ namespace PCDoctor.Services
                         RegHiveName = hiveName,
                         RegParent   = parent,
                         RegKeyName  = sub
+                    });
+                }
+            }
+            catch { }
+        }
+
+        // Cherche le mot-clé dans les valeurs (nom ou données) d'une clé registre
+        private static void ScanRegValues(string hiveName, RegistryKey hive, string parent,
+            string keyword, List<ResiduItem> result)
+        {
+            try
+            {
+                using var key = hive.OpenSubKey(parent);
+                if (key == null) return;
+                foreach (var valueName in key.GetValueNames())
+                {
+                    bool nameMatch = valueName.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
+                    bool dataMatch = key.GetValue(valueName)?.ToString()
+                        ?.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
+                    if (!nameMatch && !dataMatch) continue;
+                    var fullPath = $"{hiveName}\\{parent}\\[{valueName}]";
+                    result.Add(new ResiduItem
+                    {
+                        Path        = fullPath,
+                        Type        = ResiduType.RegistryKey,
+                        RegHiveName = hiveName,
+                        RegParent   = parent,
+                        RegKeyName  = valueName
                     });
                 }
             }
