@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 using PCDoctor.Services;
@@ -17,6 +17,7 @@ namespace PCDoctor.ViewModels
         private readonly HealthService      _health   = new();
         private readonly ReportService      _report   = new();
         private readonly UpdateCheckService _updater  = new();
+        private readonly DispatcherQueue    _dispatcher = DispatcherQueue.GetForCurrentThread();
 
         [ObservableProperty] private string osName = "";
         [ObservableProperty] private string machineName = "";
@@ -31,9 +32,40 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool updateAvailable;
         [ObservableProperty] private string updateVersion = "";
         [ObservableProperty] private string updateUrl = "";
+        [ObservableProperty] private bool isCheckingUpdate;
+        [ObservableProperty] private string updateCheckStatus = "";
 
         [RelayCommand]
         private void OpenUpdateUrl() => Process.Start(new ProcessStartInfo(UpdateUrl) { UseShellExecute = true });
+
+        [RelayCommand(CanExecute = nameof(CanCheckUpdate))]
+        private async Task CheckUpdate()
+        {
+            IsCheckingUpdate  = true;
+            UpdateCheckStatus = "Vérification en cours...";
+            UpdateAvailable   = false;
+            CheckUpdateCommand.NotifyCanExecuteChanged();
+
+            var info = await _updater.CheckAsync();
+
+            _dispatcher.TryEnqueue(() =>
+            {
+                if (info is not null)
+                {
+                    UpdateVersion     = info.Version;
+                    UpdateUrl         = info.Url;
+                    UpdateAvailable   = true;
+                    UpdateCheckStatus = $"Mise à jour v{info.Version} disponible !";
+                }
+                else
+                {
+                    UpdateCheckStatus = "PCDoctor est à jour.";
+                }
+                IsCheckingUpdate = false;
+                CheckUpdateCommand.NotifyCanExecuteChanged();
+            });
+        }
+        private bool CanCheckUpdate() => !IsCheckingUpdate;
 
         // Navigation depuis une recommandation
         [RelayCommand]
@@ -57,7 +89,7 @@ namespace PCDoctor.ViewModels
             try
             {
                 string path = await Task.Run(() => _report.Generate());
-                ReportStatus = $"Rapport créé sur le Bureau.";
+                ReportStatus = "Rapport créé sur le Bureau.";
                 Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
             }
             catch (Exception e)
@@ -81,10 +113,10 @@ namespace PCDoctor.ViewModels
                 if (ScoreTotal == 0) return new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
                 double pct = (double)ScoreOk / ScoreTotal;
                 return pct >= 1.0
-                    ? new SolidColorBrush(Color.FromArgb(255, 76,  175, 80))   // vert
+                    ? new SolidColorBrush(Color.FromArgb(255, 76,  175, 80))
                     : pct >= 0.7
-                    ? new SolidColorBrush(Color.FromArgb(255, 255, 152, 0))    // orange
-                    : new SolidColorBrush(Color.FromArgb(255, 244, 67,  54));  // rouge
+                    ? new SolidColorBrush(Color.FromArgb(255, 255, 152, 0))
+                    : new SolidColorBrush(Color.FromArgb(255, 244, 67,  54));
             }
         }
 
@@ -98,18 +130,7 @@ namespace PCDoctor.ViewModels
             UptimeText   = _sysInfo.GetUptime();
 
             _ = LoadHealthAsync();
-            _ = CheckUpdateAsync();
-        }
-
-        private async Task CheckUpdateAsync()
-        {
-            var info = await _updater.CheckAsync();
-            if (info is not null)
-            {
-                UpdateVersion   = info.Version;
-                UpdateUrl       = info.Url;
-                UpdateAvailable = true;
-            }
+            _ = CheckUpdate();
         }
 
         private void LoadData()

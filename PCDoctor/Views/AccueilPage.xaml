@@ -32,6 +32,15 @@
 
             <TextBlock Text="Tableau de bord" FontSize="32" FontWeight="SemiBold"/>
 
+            <!-- Vérification manuelle MAJ -->
+            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                <Button Content="Vérifier les mises à jour"
+                        Command="{Binding CheckUpdateCommand}"/>
+                <ProgressRing IsActive="{Binding IsCheckingUpdate}" Width="20" Height="20"/>
+                <TextBlock Text="{Binding UpdateCheckStatus}" VerticalAlignment="Center"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
+
             <!-- Infos système -->
             <Grid ColumnSpacing="20" RowSpacing="20">
                 <Grid.ColumnDefinitions>
