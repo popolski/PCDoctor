@@ -303,7 +303,7 @@ namespace PCDoctor.Services
             return false;
         }
 
-        public void SetPua(bool active)
+        public bool SetPua(bool active)
         {
             try
             {
@@ -314,6 +314,9 @@ namespace PCDoctor.Services
                 cls.InvokeMethod("Set", inParams, null);
             }
             catch (Exception e) { Logger.Warn($"SetPua : {e.Message}"); }
+            bool ok = IsPuaActive() == active;
+            Logger.Action($"PUA Protection : {(active ? "activée" : "désactivée")}{(ok ? "" : " [ECHEC VERIFICATION]")}");
+            return ok;
         }
 
         // ─── Helpers ─────────────────────────────────────────────────────────

@@ -173,8 +173,11 @@ namespace PCDoctor.ViewModels
         partial void OnPuaActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetPua(value);
-            StatusText = value ? "Protection PUA activée" : "Protection PUA désactivée";
+            bool ok = _svc.SetPua(value);
+            StatusText = ok
+                ? (value ? "Protection PUA activée" : "Protection PUA désactivée")
+                : "⚠️ Échec : état PUA inchangé. Windows Defender est peut-être géré par une stratégie de groupe.";
+            if (!ok) { _loading = true; PuaActive = !value; _loading = false; }
         }
     }
 }

@@ -81,22 +81,31 @@ namespace PCDoctor.ViewModels
         partial void OnSysMainActiveChanged(bool v)
         {
             if (_loading) return;
-            _svc.SetSysMain(v);
-            StatusText = v ? "SysMain (Superfetch) activé" : "SysMain désactivé (conseillé sur SSD)";
+            bool ok = _svc.SetSysMain(v);
+            StatusText = ok
+                ? (v ? "SysMain (Superfetch) activé" : "SysMain désactivé (conseillé sur SSD)")
+                : "⚠️ Échec : état SysMain inchangé. Vérifiez les droits administrateur.";
+            if (!ok) { _loading = true; SysMainActive = !v; _loading = false; }
         }
 
         partial void OnSearchIndexActiveChanged(bool v)
         {
             if (_loading) return;
-            _svc.SetSearchIndex(v);
-            StatusText = v ? "Indexation Windows Search activée" : "Indexation désactivée (conseillé sur HDD lent)";
+            bool ok = _svc.SetSearchIndex(v);
+            StatusText = ok
+                ? (v ? "Indexation Windows Search activée" : "Indexation désactivée (conseillé sur HDD lent)")
+                : "⚠️ Échec : état Windows Search inchangé. Vérifiez les droits administrateur.";
+            if (!ok) { _loading = true; SearchIndexActive = !v; _loading = false; }
         }
 
         partial void OnWerActiveChanged(bool v)
         {
             if (_loading) return;
-            _svc.SetWer(v);
-            StatusText = v ? "Windows Error Reporting activé" : "Windows Error Reporting désactivé";
+            bool ok = _svc.SetWer(v);
+            StatusText = ok
+                ? (v ? "Windows Error Reporting activé" : "Windows Error Reporting désactivé")
+                : "⚠️ Échec : état WER inchangé. Vérifiez les droits administrateur.";
+            if (!ok) { _loading = true; WerActive = !v; _loading = false; }
         }
     }
 }

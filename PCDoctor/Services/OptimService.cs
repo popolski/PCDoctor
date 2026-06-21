@@ -111,33 +111,39 @@ namespace PCDoctor.Services
         public bool IsSysMainActive()
             => GetServiceStartType("SysMain") != ServiceStartMode.Disabled;
 
-        public void SetSysMain(bool active)
+        public bool SetSysMain(bool active)
         {
             SetServiceStartType("SysMain", active ? ServiceStartMode.Automatic : ServiceStartMode.Disabled);
             ControlService("SysMain", active);
-            Logger.Action($"SysMain : {(active ? "actif" : "désactivé")}");
+            bool ok = IsSysMainActive() == active;
+            Logger.Action($"SysMain : {(active ? "actif" : "désactivé")}{(ok ? "" : " [ECHEC VERIFICATION]")}");
+            return ok;
         }
 
         // ── Windows Search Indexing ───────────────────────────────────────────
         public bool IsSearchIndexActive()
             => GetServiceStartType("WSearch") != ServiceStartMode.Disabled;
 
-        public void SetSearchIndex(bool active)
+        public bool SetSearchIndex(bool active)
         {
             SetServiceStartType("WSearch", active ? ServiceStartMode.Automatic : ServiceStartMode.Disabled);
             ControlService("WSearch", active);
-            Logger.Action($"Windows Search : {(active ? "actif" : "désactivé")}");
+            bool ok = IsSearchIndexActive() == active;
+            Logger.Action($"Windows Search : {(active ? "actif" : "désactivé")}{(ok ? "" : " [ECHEC VERIFICATION]")}");
+            return ok;
         }
 
         // ── Windows Error Reporting ───────────────────────────────────────────
         public bool IsWerActive()
             => GetServiceStartType("WerSvc") != ServiceStartMode.Disabled;
 
-        public void SetWer(bool active)
+        public bool SetWer(bool active)
         {
             SetServiceStartType("WerSvc", active ? ServiceStartMode.Manual : ServiceStartMode.Disabled);
             if (!active) ControlService("WerSvc", false);
-            Logger.Action($"Windows Error Reporting : {(active ? "actif" : "désactivé")}");
+            bool ok = IsWerActive() == active;
+            Logger.Action($"Windows Error Reporting : {(active ? "actif" : "désactivé")}{(ok ? "" : " [ECHEC VERIFICATION]")}");
+            return ok;
         }
 
         // ── Helpers services ──────────────────────────────────────────────────
