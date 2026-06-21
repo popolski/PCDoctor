@@ -16,9 +16,10 @@ namespace PCDoctor.Services
         public string    TypeLabel   => Type switch { ResiduType.Folder => "Dossier", ResiduType.File => "Fichier", _ => "Registre" };
 
         // Utilisés pour la suppression (meme assembly)
-        public string RegHiveName   { get; set; } = "";   // "HKLM" ou "HKCU"
+        public string RegHiveName    { get; set; } = "";   // "HKLM" ou "HKCU"
         public string RegParent     { get; set; } = "";   // ex : "SOFTWARE"
-        public string RegKeyName    { get; set; } = "";   // ex : "Firefox"
+        public string RegKeyName    { get; set; } = "";   // ex : "Firefox" (sous-clé) ou "72" (valeur)
+        public bool   IsRegValue    { get; set; } = false; // true = valeur à supprimer, false = sous-clé
     }
 
     public class ResidusService
@@ -166,7 +167,10 @@ namespace PCDoctor.Services
                             ? Registry.CurrentUser
                             : Registry.LocalMachine;
                         using var parent = hive.OpenSubKey(item.RegParent, writable: true);
-                        parent?.DeleteSubKeyTree(item.RegKeyName, throwOnMissingSubKey: false);
+                        if (item.IsRegValue)
+                            parent?.DeleteValue(item.RegKeyName, throwOnMissingValue: false);
+                        else
+                            parent?.DeleteSubKeyTree(item.RegKeyName, throwOnMissingSubKey: false);
                         Logger.Action($"Résidu supprimé (registre) : {item.Path}");
                         ok++;
                     }
@@ -229,7 +233,8 @@ namespace PCDoctor.Services
                         Type        = ResiduType.RegistryKey,
                         RegHiveName = hiveName,
                         RegParent   = parent,
-                        RegKeyName  = valueName
+                        RegKeyName  = valueName,
+                        IsRegValue  = true
                     });
                 }
             }
