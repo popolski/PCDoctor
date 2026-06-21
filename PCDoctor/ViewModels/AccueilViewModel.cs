@@ -47,7 +47,7 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool isGeneratingReport;
         [ObservableProperty] private string reportStatus = "";
         public bool CanGenerateReport => !IsGeneratingReport;
-        partial void OnIsGeneratingReportChanged(bool v) => OnPropertyChanged(nameof(CanGenerateReport));
+        partial void OnIsGeneratingReportChanged(bool value) => OnPropertyChanged(nameof(CanGenerateReport));
 
         [RelayCommand]
         private async Task GenerateReport()

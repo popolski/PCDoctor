@@ -31,8 +31,8 @@ namespace PCDoctor.ViewModels
             _loading = false;
         }
 
-        partial void OnFeatureUpdatesBlockedChanged(bool v) { if (_loading) return; _svc.SetBlockFeatureUpdates(v); }
-        partial void OnUpdatesPausedChanged(bool v)         { if (_loading) return; _svc.SetPauseUpdates(v); }
+        partial void OnFeatureUpdatesBlockedChanged(bool value) { if (_loading) return; _svc.SetBlockFeatureUpdates(value); }
+        partial void OnUpdatesPausedChanged(bool value)         { if (_loading) return; _svc.SetPauseUpdates(value); }
 
         [RelayCommand]
         private async Task CheckPending()

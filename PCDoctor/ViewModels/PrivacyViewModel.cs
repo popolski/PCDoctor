@@ -44,18 +44,18 @@ namespace PCDoctor.ViewModels
             _loading = false;
         }
 
-        partial void OnTelemetryActiveChanged(bool v)           { if (_loading) return; _svc.SetTelemetry(v);            StatusText = v ? "Télémétrie réactivée" : "Télémétrie désactivée"; }
-        partial void OnCortanaActiveChanged(bool v)             { if (_loading) return; _svc.SetCortana(v);              StatusText = v ? "Cortana réactivé" : "Cortana désactivé"; }
-        partial void OnActivityActiveChanged(bool v)            { if (_loading) return; _svc.SetActivity(v);             StatusText = v ? "Activity History réactivé" : "Activity History désactivé"; }
-        partial void OnAdsActiveChanged(bool v)                 { if (_loading) return; _svc.SetAds(v);                  StatusText = v ? "Pubs réactivées" : "Pubs désactivées"; }
-        partial void OnAdIdActiveChanged(bool v)                { if (_loading) return; _svc.SetAdId(v);                 StatusText = v ? "Advertising ID réactivé" : "Advertising ID désactivé"; }
-        partial void OnOfficeActiveChanged(bool v)              { if (_loading) return; _svc.SetOffice(v);               StatusText = v ? "Télémétrie Office réactivée" : "Télémétrie Office désactivée"; }
-        partial void OnWifiSenseActiveChanged(bool v)          { if (_loading) return; _svc.SetWifiSense(v);          StatusText = v ? "Wi-Fi Sense activé" : "Wi-Fi Sense désactivé (partage de réseaux bloqué)"; }
-        partial void OnBackgroundAppsActiveChanged(bool v)     { if (_loading) return; _svc.SetBackgroundApps(v);     StatusText = v ? "Applications en arrière-plan autorisées" : "Applications en arrière-plan bloquées"; }
-        partial void OnRecallActiveChanged(bool v)              { if (_loading) return; _svc.SetRecall(v);               StatusText = v ? "Windows Recall réactivé" : "Windows Recall désactivé (screenshots IA stoppés)"; }
-        partial void OnLocationActiveChanged(bool v)            { if (_loading) return; _svc.SetLocation(v);             StatusText = v ? "Localisation activée" : "Localisation désactivée"; }
-        partial void OnCopilotActiveChanged(bool v)             { if (_loading) return; _svc.SetCopilot(v);              StatusText = v ? "Copilot réactivé" : "Copilot désactivé"; }
-        partial void OnAiSearchActiveChanged(bool v)            { if (_loading) return; _svc.SetAiSearch(v);             StatusText = v ? "Suggestions IA activées" : "Suggestions IA dans la recherche désactivées"; }
-        partial void OnSettingsSuggestionsActiveChanged(bool v) { if (_loading) return; _svc.SetSettingsSuggestions(v);  StatusText = v ? "Suggestions Paramètres activées" : "Suggestions dans les Paramètres désactivées"; }
+        partial void OnTelemetryActiveChanged(bool value)           { if (_loading) return; _svc.SetTelemetry(value);            StatusText = value ? "T�l�m�trie r�activ�e" : "T�l�m�trie d�sactiv�e"; }
+        partial void OnCortanaActiveChanged(bool value)             { if (_loading) return; _svc.SetCortana(value);              StatusText = value ? "Cortana r�activ�" : "Cortana d�sactiv�"; }
+        partial void OnActivityActiveChanged(bool value)            { if (_loading) return; _svc.SetActivity(value);             StatusText = value ? "Activity History r�activ�" : "Activity History d�sactiv�"; }
+        partial void OnAdsActiveChanged(bool value)                 { if (_loading) return; _svc.SetAds(value);                  StatusText = value ? "Pubs r�activ�es" : "Pubs d�sactiv�es"; }
+        partial void OnAdIdActiveChanged(bool value)                { if (_loading) return; _svc.SetAdId(value);                 StatusText = value ? "Advertising ID r�activ�" : "Advertising ID d�sactiv�"; }
+        partial void OnOfficeActiveChanged(bool value)              { if (_loading) return; _svc.SetOffice(value);               StatusText = value ? "T�l�m�trie Office r�activ�e" : "T�l�m�trie Office d�sactiv�e"; }
+        partial void OnWifiSenseActiveChanged(bool value)          { if (_loading) return; _svc.SetWifiSense(value);          StatusText = value ? "Wi-Fi Sense activ�" : "Wi-Fi Sense d�sactiv� (partage de r�seaux bloqu�)"; }
+        partial void OnBackgroundAppsActiveChanged(bool value)     { if (_loading) return; _svc.SetBackgroundApps(value);     StatusText = value ? "Applications en arri�re-plan autoris�es" : "Applications en arri�re-plan bloqu�es"; }
+        partial void OnRecallActiveChanged(bool value)              { if (_loading) return; _svc.SetRecall(value);               StatusText = value ? "Windows Recall r�activ�" : "Windows Recall d�sactiv� (screenshots IA stopp�s)"; }
+        partial void OnLocationActiveChanged(bool value)            { if (_loading) return; _svc.SetLocation(value);             StatusText = value ? "Localisation activ�e" : "Localisation d�sactiv�e"; }
+        partial void OnCopilotActiveChanged(bool value)             { if (_loading) return; _svc.SetCopilot(value);              StatusText = value ? "Copilot r�activ�" : "Copilot d�sactiv�"; }
+        partial void OnAiSearchActiveChanged(bool value)            { if (_loading) return; _svc.SetAiSearch(value);             StatusText = value ? "Suggestions IA activ�es" : "Suggestions IA dans la recherche d�sactiv�es"; }
+        partial void OnSettingsSuggestionsActiveChanged(bool value) { if (_loading) return; _svc.SetSettingsSuggestions(value);  StatusText = value ? "Suggestions Param�tres activ�es" : "Suggestions dans les Param�tres d�sactiv�es"; }
     }
 }

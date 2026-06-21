@@ -30,9 +30,9 @@ namespace PCDoctor.ViewModels
             _loading = false;
         }
 
-        partial void OnIpv6ActiveChanged(bool v)       { if (_loading) return; _svc.SetIpv6(v); StatusText = v ? "IPv6 activé" : "IPv6 désactivé (déconseillé sauf besoin précis)"; }
-        partial void OnDohActiveChanged(bool v)         { if (_loading) return; _svc.SetDoh(v); StatusText = v ? "DNS chiffré (DoH Cloudflare) activé" : "DoH désactivé"; }
-        partial void OnSelectedDnsPresetChanged(string v) { if (_loading || string.IsNullOrEmpty(v)) return; StatusText = _svc.SetDnsPreset(v); }
+        partial void OnIpv6ActiveChanged(bool value)       { if (_loading) return; _svc.SetIpv6(value); StatusText = value ? "IPv6 activ�" : "IPv6 d�sactiv� (d�conseill� sauf besoin pr�cis)"; }
+        partial void OnDohActiveChanged(bool value)         { if (_loading) return; _svc.SetDoh(value); StatusText = value ? "DNS chiffr� (DoH Cloudflare) activ�" : "DoH d�sactiv�"; }
+        partial void OnSelectedDnsPresetChanged(string value) { if (_loading || string.IsNullOrEmpty(value)) return; StatusText = _svc.SetDnsPreset(value); }
 
         [RelayCommand]
         private void FlushDns() => StatusText = _svc.FlushDns();

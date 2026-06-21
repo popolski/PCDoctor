@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +18,7 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private string statusText = "Cliquez sur Analyser pour lister les pilotes installés.";
         [ObservableProperty] private bool   isLoading;
 
-        partial void OnSearchTextChanged(string v) => ApplyFilter(v);
+        partial void OnSearchTextChanged(string value) => ApplyFilter(value);
 
         [RelayCommand]
         private async Task Scan()

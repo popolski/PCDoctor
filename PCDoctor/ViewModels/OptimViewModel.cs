@@ -36,76 +36,76 @@ namespace PCDoctor.ViewModels
             _loading = false;
         }
 
-        partial void OnHibernationActiveChanged(bool v)
+        partial void OnHibernationActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetHibernation(v);
-            StatusText = v ? "Hibernation activée" : "Hibernation désactivée (espace disque libéré)";
+            _svc.SetHibernation(value);
+            StatusText = value ? "Hibernation activée" : "Hibernation désactivée (espace disque libéré)";
         }
 
-        partial void OnFastStartupActiveChanged(bool v)
+        partial void OnFastStartupActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetFastStartup(v);
-            StatusText = v ? "Démarrage rapide activé" : "Démarrage rapide désactivé (arrêt complet à chaque extinction)";
+            _svc.SetFastStartup(value);
+            StatusText = value ? "Démarrage rapide activé" : "Démarrage rapide désactivé (arrêt complet à chaque extinction)";
         }
 
-        partial void OnPowerThrottlingDisabledChanged(bool v)
+        partial void OnPowerThrottlingDisabledChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetPowerThrottling(v);
-            StatusText = v ? "Power Throttling désactivé - performances maximales" : "Power Throttling activé - économie d'énergie";
+            _svc.SetPowerThrottling(value);
+            StatusText = value ? "Power Throttling désactivé - performances maximales" : "Power Throttling activé - économie d'énergie";
         }
 
-        partial void OnMemoryCompressionActiveChanged(bool v)
+        partial void OnMemoryCompressionActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetMemoryCompression(v);
-            StatusText = v ? "Compression mémoire activée" : "Compression mémoire désactivée";
+            _svc.SetMemoryCompression(value);
+            StatusText = value ? "Compression mémoire activée" : "Compression mémoire désactivée";
         }
 
-        partial void OnVerboseStatusActiveChanged(bool v)
+        partial void OnVerboseStatusActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetVerboseStatus(v);
-            StatusText = v ? "Messages détaillés au démarrage activés" : "Messages détaillés désactivés (démarrage silencieux)";
+            _svc.SetVerboseStatus(value);
+            StatusText = value ? "Messages détaillés au démarrage activés" : "Messages détaillés désactivés (démarrage silencieux)";
         }
 
-        partial void OnUtcClockActiveChanged(bool v)
+        partial void OnUtcClockActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetUtcClock(v);
-            StatusText = v ? "Horloge UTC activée - redémarrage requis (dual-boot Linux)" : "Horloge locale restaurée (heure locale en RTC)";
+            _svc.SetUtcClock(value);
+            StatusText = value ? "Horloge UTC activée - redémarrage requis (dual-boot Linux)" : "Horloge locale restaurée (heure locale en RTC)";
         }
 
-        partial void OnSysMainActiveChanged(bool v)
+        partial void OnSysMainActiveChanged(bool value)
         {
             if (_loading) return;
-            bool ok = _svc.SetSysMain(v);
+            bool ok = _svc.SetSysMain(value);
             StatusText = ok
-                ? (v ? "SysMain (Superfetch) activé" : "SysMain désactivé (conseillé sur SSD)")
+                ? (value ? "SysMain (Superfetch) activé" : "SysMain désactivé (conseillé sur SSD)")
                 : "⚠️ Échec : état SysMain inchangé. Vérifiez les droits administrateur.";
-            if (!ok) { _loading = true; SysMainActive = !v; _loading = false; }
+            if (!ok) { _loading = true; SysMainActive = !value; _loading = false; }
         }
 
-        partial void OnSearchIndexActiveChanged(bool v)
+        partial void OnSearchIndexActiveChanged(bool value)
         {
             if (_loading) return;
-            bool ok = _svc.SetSearchIndex(v);
+            bool ok = _svc.SetSearchIndex(value);
             StatusText = ok
-                ? (v ? "Indexation Windows Search activée" : "Indexation désactivée (conseillé sur HDD lent)")
+                ? (value ? "Indexation Windows Search activée" : "Indexation désactivée (conseillé sur HDD lent)")
                 : "⚠️ Échec : état Windows Search inchangé. Vérifiez les droits administrateur.";
-            if (!ok) { _loading = true; SearchIndexActive = !v; _loading = false; }
+            if (!ok) { _loading = true; SearchIndexActive = !value; _loading = false; }
         }
 
-        partial void OnWerActiveChanged(bool v)
+        partial void OnWerActiveChanged(bool value)
         {
             if (_loading) return;
-            bool ok = _svc.SetWer(v);
+            bool ok = _svc.SetWer(value);
             StatusText = ok
-                ? (v ? "Windows Error Reporting activé" : "Windows Error Reporting désactivé")
+                ? (value ? "Windows Error Reporting activé" : "Windows Error Reporting désactivé")
                 : "⚠️ Échec : état WER inchangé. Vérifiez les droits administrateur.";
-            if (!ok) { _loading = true; WerActive = !v; _loading = false; }
+            if (!ok) { _loading = true; WerActive = !value; _loading = false; }
         }
     }
 }

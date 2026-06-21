@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PCDoctor.Services;
 
 namespace PCDoctor.ViewModels
@@ -32,49 +32,49 @@ namespace PCDoctor.ViewModels
             _loading = false;
         }
 
-        partial void OnHighPerfActiveChanged(bool v)
+        partial void OnHighPerfActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetHighPerf(v);
-            StatusText = v ? "Plan Hautes performances active" : "Plan Equilibre restaure";
+            _svc.SetHighPerf(value);
+            StatusText = value ? "Plan Hautes performances active" : "Plan Equilibre restaure";
         }
-        partial void OnGameModeActiveChanged(bool v)
+        partial void OnGameModeActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetGameMode(v);
-            StatusText = v ? "Game Mode active" : "Game Mode desactive";
+            _svc.SetGameMode(value);
+            StatusText = value ? "Game Mode active" : "Game Mode desactive";
         }
-        partial void OnHagsActiveChanged(bool v)
+        partial void OnHagsActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetHags(v);
-            StatusText = v
+            _svc.SetHags(value);
+            StatusText = value
                 ? "HAGS active - redemarrage necessaire pour prendre effet"
                 : "HAGS desactive - redemarrage necessaire pour prendre effet";
         }
-        partial void OnGameBarActiveChanged(bool v)
+        partial void OnGameBarActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetGameBar(v);
-            StatusText = v ? "Xbox Game Bar active" : "Xbox Game Bar desactive";
+            _svc.SetGameBar(value);
+            StatusText = value ? "Xbox Game Bar active" : "Xbox Game Bar desactive";
         }
-        partial void OnGpuPriorityActiveChanged(bool v)
+        partial void OnGpuPriorityActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetGpuPriority(v);
-            StatusText = v ? "Priorite GPU optimisee pour les jeux" : "Priorite GPU standard";
+            _svc.SetGpuPriority(value);
+            StatusText = value ? "Priorite GPU optimisee pour les jeux" : "Priorite GPU standard";
         }
-        partial void OnMouseAccelActiveChanged(bool v)
+        partial void OnMouseAccelActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetMouseAccel(v);
-            StatusText = v ? "Acceleration souris activee" : "Acceleration souris desactivee (visee directe)";
+            _svc.SetMouseAccel(value);
+            StatusText = value ? "Acceleration souris activee" : "Acceleration souris desactivee (visee directe)";
         }
-        partial void OnNagleDisabledChanged(bool v)
+        partial void OnNagleDisabledChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetNagle(v);
-            StatusText = v ? "Algorithme de Nagle desactive - latence TCP reduite" : "Algorithme de Nagle reactivé (defaut Windows)";
+            _svc.SetNagle(value);
+            StatusText = value ? "Algorithme de Nagle desactive - latence TCP reduite" : "Algorithme de Nagle reactivé (defaut Windows)";
         }
     }
 }

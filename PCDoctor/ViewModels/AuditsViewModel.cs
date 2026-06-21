@@ -24,7 +24,7 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private ObservableCollection<AuditRow> rows = new();
         [ObservableProperty] private bool isBusy;
         public bool CanRun => !IsBusy;
-        partial void OnIsBusyChanged(bool v) => OnPropertyChanged(nameof(CanRun));
+        partial void OnIsBusyChanged(bool value) => OnPropertyChanged(nameof(CanRun));
 
         // Audits rapides (registre / PS court) - sync ok
         [RelayCommand(CanExecute = nameof(CanRun))] private void RunDefender()   => Apply(_audit.AuditDefender());

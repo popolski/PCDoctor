@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace PCDoctor.ViewModels
         public bool MpCmdRunAvailable { get; } = File.Exists(
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
                          "Windows Defender", "MpCmdRun.exe"));
-        public bool MpCmdRunUnavailable => !MpCmdRunAvailable; // évite de déclencher les actions pendant la synchro initiale
+        public bool MpCmdRunUnavailable => !MpCmdRunAvailable;
 
         [ObservableProperty] private bool llmnrActive;
         [ObservableProperty] private bool smb1Active;
@@ -27,7 +27,7 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool bonjourInstalled;
         [ObservableProperty] private bool isDefenderBusy;
         public bool CanUseDefender => !IsDefenderBusy;
-        partial void OnIsDefenderBusyChanged(bool v) => OnPropertyChanged(nameof(CanUseDefender));
+        partial void OnIsDefenderBusyChanged(bool value) => OnPropertyChanged(nameof(CanUseDefender));
 
         // BitLocker
         [ObservableProperty] private ObservableCollection<BitLockerDrive> bitLockerDrives = new();
@@ -37,15 +37,15 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private ObservableCollection<AsrRule> asrRules = new();
         [ObservableProperty] private bool isAsrBusy;
         public bool CanUseAsr => !IsAsrBusy;
-        partial void OnIsAsrBusyChanged(bool v) => OnPropertyChanged(nameof(CanUseAsr));
+        partial void OnIsAsrBusyChanged(bool value) => OnPropertyChanged(nameof(CanUseAsr));
 
         // Exploit Protection
         [ObservableProperty] private string exploitProtectionText = "Chargement...";
         [ObservableProperty] private bool exploitProtectionEnabled;
-        partial void OnExploitProtectionEnabledChanged(bool v)
+        partial void OnExploitProtectionEnabledChanged(bool value)
         {
             if (_loading) return;
-            _ = ToggleExploitProtectionAsync(v);
+            _ = ToggleExploitProtectionAsync(value);
         }
         private async Task ToggleExploitProtectionAsync(bool enable)
         {
@@ -81,7 +81,6 @@ namespace PCDoctor.ViewModels
 
         private async Task LoadAdvancedAsync()
         {
-            // BitLocker
             var drives = await Task.Run(() => _svc.GetBitLockerStatus());
             BitLockerDrives.Clear();
             foreach (var d in drives) BitLockerDrives.Add(d);
@@ -89,12 +88,10 @@ namespace PCDoctor.ViewModels
                 ? "BitLocker non disponible ou aucun volume détecté."
                 : $"{drives.Count} volume(s) détecté(s).";
 
-            // ASR
             var rules = await Task.Run(() => _svc.GetAsrRules());
             AsrRules.Clear();
             foreach (var r in rules) AsrRules.Add(r);
 
-            // Exploit Protection
             var ep = await Task.Run(() => _svc.GetExploitProtection());
             _loading = true;
             ExploitProtectionEnabled = ep.DepEnabled && ep.AslrEnabled && ep.SeheEnabled;
@@ -121,11 +118,11 @@ namespace PCDoctor.ViewModels
             SignatureInfo = $"v{ver}  —  {date}";
         }
 
-        partial void OnMdnsActiveChanged(bool v)
+        partial void OnMdnsActiveChanged(bool value)
         {
             if (_loading) return;
-            _svc.SetMdns(v);
-            StatusText = v ? "mDNS reactivé" : "mDNS desactive - redemarrage recommande pour prendre effet";
+            _svc.SetMdns(value);
+            StatusText = value ? "mDNS réactivé" : "mDNS désactivé — redémarrage recommandé pour prendre effet";
         }
 
         [RelayCommand]
@@ -154,8 +151,6 @@ namespace PCDoctor.ViewModels
             IsDefenderBusy = false;
         }
 
-        // Les méthodes On...Changed sont générées par le toolkit : appelées
-        // automatiquement quand la propriété change (donc quand l'utilisateur bascule le toggle).
         partial void OnLlmnrActiveChanged(bool value)
         {
             if (_loading) return;

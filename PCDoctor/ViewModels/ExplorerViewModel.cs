@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PCDoctor.Services;
 
@@ -42,17 +42,17 @@ namespace PCDoctor.ViewModels
             _loading = false;
         }
 
-        partial void OnFileExtVisibleChanged(bool v)     { if (_loading) return; _svc.SetFileExtVisible(v);     StatusText = v ? "Extensions de fichiers visibles" : "Extensions masquées"; }
-        partial void OnHiddenVisibleChanged(bool v)      { if (_loading) return; _svc.SetHiddenVisible(v);      StatusText = v ? "Fichiers cachés visibles" : "Fichiers cachés masqués"; }
-        partial void OnSuperHiddenVisibleChanged(bool v) { if (_loading) return; _svc.SetSuperHiddenVisible(v); StatusText = v ? "Fichiers système visibles" : "Fichiers système masqués"; }
-        partial void OnFullPathInTitleChanged(bool v)    { if (_loading) return; _svc.SetFullPathInTitle(v);    StatusText = v ? "Chemin complet dans la barre de titre" : "Chemin complet désactivé"; }
-        partial void OnIconsOnlyChanged(bool v)          { if (_loading) return; _svc.SetIconsOnly(v);          StatusText = v ? "Vignettes désactivées (icônes seules)" : "Vignettes activées"; }
-        partial void OnEndTaskEnabledChanged(bool v)     { if (_loading) return; _svc.SetEndTask(v);            StatusText = v ? "\"Fin de tâche\" disponible dans la barre des tâches" : "\"Fin de tâche\" masqué"; }
-        partial void OnNumLockOnBootChanged(bool v)       { if (_loading) return; _svc.SetNumLockOnBoot(v);        StatusText = v ? "NumLock activé au démarrage" : "NumLock désactivé au démarrage"; }
-        partial void OnTaskbarCenteredChanged(bool v)     { if (_loading) return; _svc.SetTaskbarCentered(v);     StatusText = v ? "Barre des tâches centrée" : "Barre des tâches à gauche"; }
-        partial void OnSearchBarModeChanged(int v)        { if (_loading) return; _svc.SetSearchBarMode(v);       StatusText = v == 0 ? "Recherche masquée" : v == 1 ? "Recherche : icône" : "Barre de recherche complète"; }
-        partial void OnWidgetsEnabledChanged(bool v)      { if (_loading) return; _svc.SetWidgets(v);             StatusText = v ? "Widgets activés" : "Widgets masqués"; }
-        partial void OnClassicContextMenuChanged(bool v)  { if (_loading) return; _svc.SetClassicContextMenu(v);  StatusText = v ? "Menu contextuel classique activé (redémarrage Explorateur requis)" : "Menu contextuel Windows 11 restauré"; }
+        partial void OnFileExtVisibleChanged(bool value)     { if (_loading) return; _svc.SetFileExtVisible(value);     StatusText = value ? "Extensions de fichiers visibles" : "Extensions masquées"; }
+        partial void OnHiddenVisibleChanged(bool value)      { if (_loading) return; _svc.SetHiddenVisible(value);      StatusText = value ? "Fichiers cachés visibles" : "Fichiers cachés masqués"; }
+        partial void OnSuperHiddenVisibleChanged(bool value) { if (_loading) return; _svc.SetSuperHiddenVisible(value); StatusText = value ? "Fichiers système visibles" : "Fichiers système masqués"; }
+        partial void OnFullPathInTitleChanged(bool value)    { if (_loading) return; _svc.SetFullPathInTitle(value);    StatusText = value ? "Chemin complet dans la barre de titre" : "Chemin complet désactivé"; }
+        partial void OnIconsOnlyChanged(bool value)          { if (_loading) return; _svc.SetIconsOnly(value);          StatusText = value ? "Vignettes désactivées (icônes seules)" : "Vignettes activées"; }
+        partial void OnEndTaskEnabledChanged(bool value)     { if (_loading) return; _svc.SetEndTask(value);            StatusText = value ? "\"Fin de tâche\" disponible dans la barre des tâches" : "\"Fin de tâche\" masqué"; }
+        partial void OnNumLockOnBootChanged(bool value)       { if (_loading) return; _svc.SetNumLockOnBoot(value);        StatusText = value ? "NumLock activé au démarrage" : "NumLock désactivé au démarrage"; }
+        partial void OnTaskbarCenteredChanged(bool value)     { if (_loading) return; _svc.SetTaskbarCentered(value);     StatusText = value ? "Barre des tâches centrée" : "Barre des tâches à gauche"; }
+        partial void OnSearchBarModeChanged(int value)        { if (_loading) return; _svc.SetSearchBarMode(value);       StatusText = value == 0 ? "Recherche masquée" : value == 1 ? "Recherche : icône" : "Barre de recherche complète"; }
+        partial void OnWidgetsEnabledChanged(bool value)      { if (_loading) return; _svc.SetWidgets(value);             StatusText = value ? "Widgets activés" : "Widgets masqués"; }
+        partial void OnClassicContextMenuChanged(bool value)  { if (_loading) return; _svc.SetClassicContextMenu(value);  StatusText = value ? "Menu contextuel classique activé (redémarrage Explorateur requis)" : "Menu contextuel Windows 11 restauré"; }
 
         [RelayCommand]
         private void RestartExplorer()

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -63,7 +63,7 @@ namespace PCDoctor.ViewModels
         }
 
         public bool CanApply => !IsApplying;
-        partial void OnIsApplyingChanged(bool v) => OnPropertyChanged(nameof(CanApply));
+        partial void OnIsApplyingChanged(bool value) => OnPropertyChanged(nameof(CanApply));
 
         public ProfilesViewModel()
         {
@@ -75,11 +75,11 @@ namespace PCDoctor.ViewModels
             _loading = false;
         }
 
-        partial void OnSelectedPlanChanged(string v)
+        partial void OnSelectedPlanChanged(string value)
         {
-            if (_loading || string.IsNullOrEmpty(v) || v == "Personnalisé" || v == "Inconnu") return;
-            _svc.SetPowerPlan(v);
-            StatusText = $"Plan appliqué : {v}";
+            if (_loading || string.IsNullOrEmpty(value) || value == "Personnalisé" || value == "Inconnu") return;
+            _svc.SetPowerPlan(value);
+            StatusText = $"Plan appliqué : {value}";
         }
 
         [RelayCommand]
