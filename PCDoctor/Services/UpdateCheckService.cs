@@ -12,26 +12,26 @@ namespace PCDoctor.Services
         private const string CurrentVersion = "0.9"; // TEST ONLY — remettre "1.0" après
         private const string ApiUrl = "https://api.github.com/repos/popolski/PCDoctor/releases/latest";
 
-        public async Task<UpdateInfo?> CheckAsync()
+        public async Task<(UpdateInfo? Info, string? Error)> CheckAsync()
         {
             try
             {
                 using var http = new HttpClient();
-                http.Timeout = TimeSpan.FromSeconds(5);
+                http.Timeout = TimeSpan.FromSeconds(8);
                 http.DefaultRequestHeaders.UserAgent.ParseAdd("PCDoctor/" + CurrentVersion);
 
                 var release = await http.GetFromJsonAsync<GitHubRelease>(ApiUrl);
-                if (release is null) return null;
+                if (release is null) return (null, "Réponse vide de l'API GitHub.");
 
                 var latest = release.TagName?.TrimStart('v') ?? "";
                 if (IsNewer(latest, CurrentVersion))
-                    return new UpdateInfo(latest, release.HtmlUrl ?? "");
+                    return (new UpdateInfo(latest, release.HtmlUrl ?? ""), null);
 
-                return null;
+                return (null, null);
             }
-            catch
+            catch (Exception e)
             {
-                return null;
+                return (null, e.Message);
             }
         }
 

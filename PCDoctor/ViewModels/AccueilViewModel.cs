@@ -46,11 +46,15 @@ namespace PCDoctor.ViewModels
             UpdateAvailable   = false;
             CheckUpdateCommand.NotifyCanExecuteChanged();
 
-            var info = await _updater.CheckAsync();
+            var (info, error) = await _updater.CheckAsync();
 
             _dispatcher.TryEnqueue(() =>
             {
-                if (info is not null)
+                if (error is not null)
+                {
+                    UpdateCheckStatus = $"⚠️ Erreur : {error}";
+                }
+                else if (info is not null)
                 {
                     UpdateVersion     = info.Version;
                     UpdateUrl         = info.Url;
