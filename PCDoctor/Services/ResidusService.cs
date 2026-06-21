@@ -217,8 +217,10 @@ namespace PCDoctor.Services
                 foreach (var valueName in key.GetValueNames())
                 {
                     bool nameMatch = valueName.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
-                    bool dataMatch = key.GetValue(valueName)?.ToString()
-                        ?.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
+                    var raw = key.GetValue(valueName);
+                    // REG_MULTI_SZ est un string[] — ToString() donne "System.String[]", il faut joindre
+                    string dataStr = raw is string[] arr ? string.Join(" ", arr) : raw?.ToString() ?? "";
+                    bool dataMatch = dataStr.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
                     if (!nameMatch && !dataMatch) continue;
                     var fullPath = $"{hiveName}\\{parent}\\[{valueName}]";
                     result.Add(new ResiduItem
