@@ -5,7 +5,7 @@ using Microsoft.Win32;
 
 namespace PCDoctor.Services
 {
-    public enum ResiduType { Folder, RegistryKey }
+    public enum ResiduType { Folder, File, RegistryKey }
 
     public class ResiduItem
     {
@@ -13,7 +13,7 @@ namespace PCDoctor.Services
         public ResiduType Type       { get; set; }
         public string    SizeStr     { get; set; } = "";
         public bool      IsSelected  { get; set; } = false;
-        public string    TypeLabel   => Type == ResiduType.Folder ? "Dossier" : "Registre";
+        public string    TypeLabel   => Type switch { ResiduType.Folder => "Dossier", ResiduType.File => "Fichier", _ => "Registre" };
 
         // Utilisés pour la suppression (meme assembly)
         public string RegHiveName   { get; set; } = "";   // "HKLM" ou "HKCU"
@@ -30,6 +30,17 @@ namespace PCDoctor.Services
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+        };
+
+        // Emplacements de raccourcis et menus Démarrer
+        private static readonly string[] ShortcutRoots =
+        {
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms),   // Start Menu\Programs (ProgramData)
+            Environment.GetFolderPath(Environment.SpecialFolder.Programs),          // Start Menu\Programs (User)
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup),
+            Environment.GetFolderPath(Environment.SpecialFolder.Startup),
+            Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory),
         };
 
         // Scan : recherche par mot-clé dans les emplacements typiques
@@ -51,6 +62,28 @@ namespace PCDoctor.Services
                     foreach (var sub in Directory.GetDirectories(root, "*", SearchOption.TopDirectoryOnly))
                     {
                         ScanFolderLevel(sub, keyword, seen, result);
+                    }
+                }
+                catch { }
+            }
+
+            // Raccourcis .lnk dans Start Menu, Bureau, Démarrage
+            foreach (var root in ShortcutRoots)
+            {
+                if (!Directory.Exists(root)) continue;
+                try
+                {
+                    // Dossier dans le Start Menu dont le nom contient le mot-clé
+                    foreach (var dir in Directory.GetDirectories(root, $"*{keyword}*", SearchOption.TopDirectoryOnly))
+                    {
+                        if (!seen.Add(dir)) continue;
+                        result.Add(new ResiduItem { Path = dir, Type = ResiduType.Folder, SizeStr = "" });
+                    }
+                    // Fichiers .lnk dont le nom contient le mot-clé
+                    foreach (var lnk in Directory.GetFiles(root, $"*{keyword}*.lnk", SearchOption.AllDirectories))
+                    {
+                        if (!seen.Add(lnk)) continue;
+                        result.Add(new ResiduItem { Path = lnk, Type = ResiduType.File, SizeStr = "Raccourci" });
                     }
                 }
                 catch { }
@@ -107,6 +140,12 @@ namespace PCDoctor.Services
                     {
                         Directory.Delete(item.Path, recursive: true);
                         Logger.Action($"Résidu supprimé (dossier) : {item.Path}");
+                        ok++;
+                    }
+                    else if (item.Type == ResiduType.File)
+                    {
+                        File.Delete(item.Path);
+                        Logger.Action($"Résidu supprimé (fichier) : {item.Path}");
                         ok++;
                     }
                     else
