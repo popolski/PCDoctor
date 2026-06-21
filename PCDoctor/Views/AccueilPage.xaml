@@ -18,14 +18,21 @@
                      IsClosable="True"
                      Title="Mise à jour disponible">
                 <InfoBar.Content>
-                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                        <TextBlock VerticalAlignment="Center">
-                            <Run Text="PCDoctor v"/>
-                            <Run Text="{Binding UpdateVersion}"/>
-                            <Run Text=" est disponible."/>
-                        </TextBlock>
-                        <Button Content="Télécharger" Command="{Binding OpenUpdateUrlCommand}"
-                                Style="{StaticResource AccentButtonStyle}"/>
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                            <TextBlock VerticalAlignment="Center">
+                                <Run Text="PCDoctor v"/>
+                                <Run Text="{Binding UpdateVersion}"/>
+                                <Run Text=" est disponible."/>
+                            </TextBlock>
+                            <Button Content="Installer" Command="{Binding InstallUpdateCommand}"
+                                    Style="{StaticResource AccentButtonStyle}"/>
+                            <Button Content="Voir sur GitHub" Command="{Binding OpenUpdateUrlCommand}"/>
+                            <ProgressRing IsActive="{Binding IsDownloading}" Width="20" Height="20"/>
+                        </StackPanel>
+                        <ProgressBar Value="{Binding DownloadProgress}" Maximum="100"
+                                     Visibility="{Binding IsDownloading}"
+                                     Width="400" HorizontalAlignment="Left"/>
                     </StackPanel>
                 </InfoBar.Content>
             </InfoBar>

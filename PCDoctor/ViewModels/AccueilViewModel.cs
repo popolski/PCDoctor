@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -32,8 +33,12 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool updateAvailable;
         [ObservableProperty] private string updateVersion = "";
         [ObservableProperty] private string updateUrl = "";
+        [ObservableProperty] private string? updateAssetUrl;
         [ObservableProperty] private bool isCheckingUpdate;
         [ObservableProperty] private string updateCheckStatus = "";
+        [ObservableProperty] private bool isDownloading;
+        [ObservableProperty] private int downloadProgress;
+        public bool HasAsset => !string.IsNullOrEmpty(UpdateAssetUrl);
 
         [RelayCommand]
         private void OpenUpdateUrl() => Process.Start(new ProcessStartInfo(UpdateUrl) { UseShellExecute = true });
@@ -58,8 +63,10 @@ namespace PCDoctor.ViewModels
                 {
                     UpdateVersion     = info.Version;
                     UpdateUrl         = info.Url;
+                    UpdateAssetUrl    = info.AssetUrl;
                     UpdateAvailable   = true;
                     UpdateCheckStatus = $"Mise à jour v{info.Version} disponible !";
+                    OnPropertyChanged(nameof(HasAsset));
                 }
                 else
                 {
@@ -70,6 +77,49 @@ namespace PCDoctor.ViewModels
             });
         }
         private bool CanCheckUpdate() => !IsCheckingUpdate;
+
+        [RelayCommand(CanExecute = nameof(CanInstall))]
+        private async Task InstallUpdate()
+        {
+            if (string.IsNullOrEmpty(UpdateAssetUrl)) return;
+            IsDownloading   = true;
+            DownloadProgress = 0;
+            UpdateCheckStatus = "Téléchargement...";
+            InstallUpdateCommand.NotifyCanExecuteChanged();
+
+            try
+            {
+                string dest = Path.Combine(Path.GetTempPath(),
+                    $"PCDoctor_Setup_v{UpdateVersion}.exe");
+
+                var progress = new Progress<int>(p => _dispatcher.TryEnqueue(() =>
+                {
+                    DownloadProgress  = p;
+                    UpdateCheckStatus = $"Téléchargement... {p}%";
+                }));
+
+                await _updater.DownloadAsync(UpdateAssetUrl, dest, progress);
+
+                _dispatcher.TryEnqueue(() =>
+                {
+                    UpdateCheckStatus = "Lancement de l'installation...";
+                    Process.Start(new ProcessStartInfo(dest) { UseShellExecute = true });
+                });
+            }
+            catch (Exception e)
+            {
+                _dispatcher.TryEnqueue(() => UpdateCheckStatus = $"⚠️ Erreur : {e.Message}");
+            }
+            finally
+            {
+                _dispatcher.TryEnqueue(() =>
+                {
+                    IsDownloading = false;
+                    InstallUpdateCommand.NotifyCanExecuteChanged();
+                });
+            }
+        }
+        private bool CanInstall() => !IsDownloading && HasAsset;
 
         // Navigation depuis une recommandation
         [RelayCommand]

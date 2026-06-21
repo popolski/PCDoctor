@@ -1,12 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PCDoctor.Services
 {
-    public record UpdateInfo(string Version, string Url);
+    public record UpdateInfo(string Version, string Url, string? AssetUrl);
 
     public class UpdateCheckService
     {
@@ -25,10 +28,19 @@ namespace PCDoctor.Services
                 if (release is null) return (null, "Réponse vide de l'API GitHub.");
 
                 var latest = release.TagName?.TrimStart('v') ?? "";
-                if (IsNewer(latest, CurrentVersion))
-                    return (new UpdateInfo(latest, release.HtmlUrl ?? ""), null);
+                if (!IsNewer(latest, CurrentVersion)) return (null, null);
 
-                return (null, null);
+                string? assetUrl = null;
+                foreach (var asset in release.Assets ?? [])
+                {
+                    if (asset.Name?.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        assetUrl = asset.DownloadUrl;
+                        break;
+                    }
+                }
+
+                return (new UpdateInfo(latest, release.HtmlUrl ?? "", assetUrl), null);
             }
             catch (Exception e)
             {
@@ -36,12 +48,35 @@ namespace PCDoctor.Services
             }
         }
 
-        private static bool IsNewer(string latest, string current)
+        public async Task DownloadAsync(string url, string destPath,
+            IProgress<int> progress, CancellationToken ct = default)
         {
-            return Version.TryParse(latest, out var l)
-                && Version.TryParse(current, out var c)
-                && l > c;
+            using var http = new HttpClient();
+            http.DefaultRequestHeaders.UserAgent.ParseAdd("PCDoctor/" + CurrentVersion);
+
+            using var response = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
+            response.EnsureSuccessStatusCode();
+
+            long total = response.Content.Headers.ContentLength ?? -1;
+            using var src  = await response.Content.ReadAsStreamAsync(ct);
+            using var dest = File.Create(destPath);
+
+            var buffer = new byte[81920];
+            long downloaded = 0;
+            int read;
+            while ((read = await src.ReadAsync(buffer, ct)) > 0)
+            {
+                await dest.WriteAsync(buffer.AsMemory(0, read), ct);
+                downloaded += read;
+                if (total > 0)
+                    progress.Report((int)(downloaded * 100 / total));
+            }
         }
+
+        private static bool IsNewer(string latest, string current) =>
+            Version.TryParse(latest, out var l)
+            && Version.TryParse(current, out var c)
+            && l > c;
 
         private sealed class GitHubRelease
         {
@@ -50,6 +85,18 @@ namespace PCDoctor.Services
 
             [JsonPropertyName("html_url")]
             public string? HtmlUrl  { get; init; }
+
+            [JsonPropertyName("assets")]
+            public List<GitHubAsset>? Assets { get; init; }
+        }
+
+        private sealed class GitHubAsset
+        {
+            [JsonPropertyName("name")]
+            public string? Name { get; init; }
+
+            [JsonPropertyName("browser_download_url")]
+            public string? DownloadUrl { get; init; }
         }
     }
 }
