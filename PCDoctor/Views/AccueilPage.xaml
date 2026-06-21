@@ -12,6 +12,24 @@
 
     <ScrollViewer>
         <StackPanel Margin="40" Spacing="20">
+
+            <InfoBar IsOpen="{Binding UpdateAvailable}"
+                     Severity="Informational"
+                     IsClosable="True"
+                     Title="Mise à jour disponible">
+                <InfoBar.Content>
+                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center">
+                            <Run Text="PCDoctor v"/>
+                            <Run Text="{Binding UpdateVersion}"/>
+                            <Run Text=" est disponible."/>
+                        </TextBlock>
+                        <Button Content="Télécharger" Command="{Binding OpenUpdateUrlCommand}"
+                                Style="{StaticResource AccentButtonStyle}"/>
+                    </StackPanel>
+                </InfoBar.Content>
+            </InfoBar>
+
             <TextBlock Text="Tableau de bord" FontSize="32" FontWeight="SemiBold"/>
 
             <!-- Infos système -->

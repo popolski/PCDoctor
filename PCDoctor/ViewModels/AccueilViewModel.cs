@@ -13,9 +13,10 @@ namespace PCDoctor.ViewModels
 {
     public partial class AccueilViewModel : ObservableObject
     {
-        private readonly SystemInfoService _sysInfo  = new();
-        private readonly HealthService     _health   = new();
-        private readonly ReportService     _report   = new();
+        private readonly SystemInfoService  _sysInfo  = new();
+        private readonly HealthService      _health   = new();
+        private readonly ReportService      _report   = new();
+        private readonly UpdateCheckService _updater  = new();
 
         [ObservableProperty] private string osName = "";
         [ObservableProperty] private string machineName = "";
@@ -25,6 +26,14 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private string defenderText = "";
         [ObservableProperty] private bool defenderOk;
         [ObservableProperty] private string uptimeText = "";
+
+        // Mise à jour disponible
+        [ObservableProperty] private bool updateAvailable;
+        [ObservableProperty] private string updateVersion = "";
+        [ObservableProperty] private string updateUrl = "";
+
+        [RelayCommand]
+        private void OpenUpdateUrl() => Process.Start(new ProcessStartInfo(UpdateUrl) { UseShellExecute = true });
 
         // Navigation depuis une recommandation
         [RelayCommand]
@@ -89,6 +98,18 @@ namespace PCDoctor.ViewModels
             UptimeText   = _sysInfo.GetUptime();
 
             _ = LoadHealthAsync();
+            _ = CheckUpdateAsync();
+        }
+
+        private async Task CheckUpdateAsync()
+        {
+            var info = await _updater.CheckAsync();
+            if (info is not null)
+            {
+                UpdateVersion   = info.Version;
+                UpdateUrl       = info.Url;
+                UpdateAvailable = true;
+            }
         }
 
         private void LoadData()
