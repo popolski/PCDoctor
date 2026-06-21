@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace PCDoctor.Services
@@ -44,7 +45,10 @@ namespace PCDoctor.Services
 
         private sealed class GitHubRelease
         {
+            [JsonPropertyName("tag_name")]
             public string? TagName  { get; init; }
+
+            [JsonPropertyName("html_url")]
             public string? HtmlUrl  { get; init; }
         }
     }
