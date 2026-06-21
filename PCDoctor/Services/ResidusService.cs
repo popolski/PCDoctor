@@ -31,6 +31,7 @@ namespace PCDoctor.Services
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow"),
         };
 
         // Emplacements de raccourcis et menus Démarrer
