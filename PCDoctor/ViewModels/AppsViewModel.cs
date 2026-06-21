@@ -63,8 +63,8 @@ namespace PCDoctor.ViewModels
             if (_svc.Uninstall(app))
             {
                 StatusText = $"Désinstallation de {app.Name} lancée.";
-                // Pré-remplir le champ résidus avec le nom de l'app désinstallée
-                ResidusSearchName  = app.Name;
+                // Pré-remplir le champ résidus avec le nom court (sans version ni architecture)
+                ResidusSearchName  = StripVersion(app.Name);
                 ResidusStatusText  = $"Désinstallation lancée. Une fois terminée, cliquez sur Scanner pour chercher les résidus de \"{app.Name}\".";
                 ResidusHasResults  = false;
                 ResidusItems.Clear();
@@ -114,6 +114,16 @@ namespace PCDoctor.ViewModels
 
             // Rescan après suppression
             await ScanResidus();
+        }
+
+        // Supprime numéros de version et architecture : "7-Zip 26.01 (x64)" → "7-Zip"
+        private static string StripVersion(string name)
+        {
+            // Retire les parenthèses et leur contenu : "(x64)", "(64-bit)"...
+            var s = System.Text.RegularExpressions.Regex.Replace(name, @"\s*\(.*?\)", "").Trim();
+            // Retire les numéros de version en fin de chaîne : "26.01", "1.2.3.4"...
+            s = System.Text.RegularExpressions.Regex.Replace(s, @"\s+[\d]+[\d.\-_]*$", "").Trim();
+            return string.IsNullOrWhiteSpace(s) ? name : s;
         }
     }
 }

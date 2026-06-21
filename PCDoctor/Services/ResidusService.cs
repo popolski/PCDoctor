@@ -73,15 +73,17 @@ namespace PCDoctor.Services
                 if (!Directory.Exists(root)) continue;
                 try
                 {
-                    // Dossier dans le Start Menu dont le nom contient le mot-clé
-                    foreach (var dir in Directory.GetDirectories(root, $"*{keyword}*", SearchOption.TopDirectoryOnly))
+                    // Dossier dans le Start Menu dont le nom matche le mot-clé
+                    foreach (var dir in Directory.GetDirectories(root, "*", SearchOption.TopDirectoryOnly))
                     {
+                        if (!Matches(System.IO.Path.GetFileName(dir), keyword)) continue;
                         if (!seen.Add(dir)) continue;
                         result.Add(new ResiduItem { Path = dir, Type = ResiduType.Folder, SizeStr = "" });
                     }
-                    // Fichiers .lnk dont le nom contient le mot-clé
-                    foreach (var lnk in Directory.GetFiles(root, $"*{keyword}*.lnk", SearchOption.AllDirectories))
+                    // Fichiers .lnk dont le nom matche le mot-clé
+                    foreach (var lnk in Directory.GetFiles(root, "*.lnk", SearchOption.AllDirectories))
                     {
+                        if (!Matches(System.IO.Path.GetFileNameWithoutExtension(lnk), keyword)) continue;
                         if (!seen.Add(lnk)) continue;
                         result.Add(new ResiduItem { Path = lnk, Type = ResiduType.File, SizeStr = "Raccourci" });
                     }
@@ -107,14 +109,20 @@ namespace PCDoctor.Services
             return result;
         }
 
+        // Correspondance dans les deux sens : "7-Zip" matche "7-Zip 26.01 (x64)" et vice-versa
+        private static bool Matches(string name, string keyword) =>
+            name.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0
+            || keyword.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0;
+
         private static void ScanFolderLevel(string root, string keyword,
             HashSet<string> seen, List<ResiduItem> result)
         {
             if (!Directory.Exists(root)) return;
             try
             {
-                foreach (var dir in Directory.GetDirectories(root, $"*{keyword}*", SearchOption.TopDirectoryOnly))
+                foreach (var dir in Directory.GetDirectories(root, "*", SearchOption.TopDirectoryOnly))
                 {
+                    if (!Matches(System.IO.Path.GetFileName(dir), keyword)) continue;
                     if (!seen.Add(dir)) continue;
                     if (SafetyGuard.IsProtectedResidu(dir)) continue;
                     result.Add(new ResiduItem
@@ -178,7 +186,7 @@ namespace PCDoctor.Services
                 if (key == null) return;
                 foreach (var sub in key.GetSubKeyNames())
                 {
-                    if (sub.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) < 0) continue;
+                    if (!Matches(sub, keyword)) continue;
                     var fullPath = $"{hiveName}\\{parent}\\{sub}";
                     if (SafetyGuard.IsProtectedResidu(fullPath)) continue;
                     result.Add(new ResiduItem
