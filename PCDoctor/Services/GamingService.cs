@@ -16,7 +16,7 @@ namespace PCDoctor.Services
         {
             try
             {
-                var output = RunPsOutput("powercfg /getactivescheme");
+                var output = RunExe("powercfg", "/getactivescheme");
                 return output.Contains(GuidHighPerf, StringComparison.OrdinalIgnoreCase)
                     || output.Contains(GuidUltimate,  StringComparison.OrdinalIgnoreCase);
             }
@@ -26,18 +26,16 @@ namespace PCDoctor.Services
         {
             if (active)
             {
-                // Tente Ultimate Performance (peut ne pas exister sur certaines editions)
-                RunPs($"powercfg /duplicatescheme {GuidUltimate}");
-                RunPs($"powercfg /setactive {GuidUltimate}");
-                // Si l'activation a echoue, bascule sur High Performance classique
-                var check = RunPsOutput("powercfg /getactivescheme");
+                RunExe("powercfg", $"/duplicatescheme {GuidUltimate}");
+                RunExe("powercfg", $"/setactive {GuidUltimate}");
+                var check = RunExe("powercfg", "/getactivescheme");
                 if (!check.Contains(GuidUltimate, StringComparison.OrdinalIgnoreCase))
-                    RunPs($"powercfg /setactive {GuidHighPerf}");
+                    RunExe("powercfg", $"/setactive {GuidHighPerf}");
                 Logger.Action("Plan alimentation: Hautes performances actif");
             }
             else
             {
-                RunPs($"powercfg /setactive {GuidBalanced}");
+                RunExe("powercfg", $"/setactive {GuidBalanced}");
                 Logger.Action("Plan alimentation: Equilibre restaure");
             }
         }
@@ -217,22 +215,11 @@ namespace PCDoctor.Services
             }
             catch { }
         }
-        private static void RunPs(string cmd)
+        private static string RunExe(string exe, string args)
         {
             try
             {
-                var psi = new ProcessStartInfo("powershell", $"-NoProfile -Command \"{cmd}\"")
-                    { UseShellExecute = false, CreateNoWindow = true };
-                using var p = Process.Start(psi);
-                p?.WaitForExit();
-            }
-            catch { }
-        }
-        private static string RunPsOutput(string cmd)
-        {
-            try
-            {
-                var psi = new ProcessStartInfo("powershell", $"-NoProfile -Command \"{cmd}\"")
+                var psi = new ProcessStartInfo(exe, args)
                     { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
                 using var p = Process.Start(psi)!;
                 var output = p.StandardOutput.ReadToEnd();
