@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Diagnostics;
+using System.ServiceProcess;
 using Microsoft.Win32;
 
 namespace PCDoctor.Services
@@ -14,12 +15,14 @@ namespace PCDoctor.Services
         }
         public void SetHibernation(bool active)
         {
-            RunCmd($"powercfg /h {(active ? "on" : "off")}");
+            var psi = new ProcessStartInfo("powercfg", $"/h {(active ? "on" : "off")}")
+                { UseShellExecute = false, CreateNoWindow = true };
+            using var p = Process.Start(psi);
+            p?.WaitForExit();
             Logger.Action($"Hibernation {(active ? "activée" : "désactivée")}");
         }
 
         // ── Fast Startup ─────────────────────────────────────────────────────
-        // HiberbootEnabled = 1 -> Fast Startup actif
         public bool IsFastStartupActive()
         {
             var v = RegistryHelper.GetDword(@"SYSTEM\CurrentControlSet\Control\Session Manager\Power", "HiberbootEnabled");
@@ -32,8 +35,6 @@ namespace PCDoctor.Services
         }
 
         // ── Power Throttling ─────────────────────────────────────────────────
-        // PowerThrottlingOff = 1 -> throttling DESACTIVE (meilleures perfs)
-        // Convention UI : ON = fonctionnalite active = throttling desactive = boost perf
         public bool IsPowerThrottlingDisabled()
         {
             using var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Power\PowerThrottling");
@@ -48,7 +49,7 @@ namespace PCDoctor.Services
         }
 
         // ── Compression mémoire ───────────────────────────────────────────────
-        // Gérée par PowerShell (Enable/Disable-MMAgent -MemoryCompression)
+        // Pas d'API .NET pour MMAgent — PowerShell reste nécessaire ici
         public bool IsMemoryCompressionActive()
         {
             try
@@ -71,7 +72,6 @@ namespace PCDoctor.Services
         }
 
         // ── Messages de démarrage détaillés (Verbose Status) ─────────────────
-        // VerboseStatus = 1 -> affiche "Application des stratégies..." au boot/arrêt
         public bool IsVerboseStatusActive()
         {
             var v = RegistryHelper.GetDword(
@@ -86,11 +86,10 @@ namespace PCDoctor.Services
             else
                 RegistryHelper.DeleteValueHklm(
                     @"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System", "VerboseStatus");
-            Logger.Action($"Verbose Status : {(active ? "actif" : "desactive")}");
+            Logger.Action($"Verbose Status : {(active ? "actif" : "désactivé")}");
         }
 
-        // ── Horloge UTC (dual-boot Linux) ────────────────────────────────────
-        // RealTimeIsUniversal = 1 -> Windows stocke l'heure RTC en UTC (comme Linux)
+        // ── Horloge UTC ──────────────────────────────────────────────────────
         public bool IsUtcClockActive()
         {
             var v = RegistryHelper.GetDword(
@@ -110,86 +109,74 @@ namespace PCDoctor.Services
 
         // ── SysMain (Superfetch) ──────────────────────────────────────────────
         public bool IsSysMainActive()
-        {
-            try
-            {
-                var psi = new ProcessStartInfo("powershell.exe",
-                    "-NoProfile -NonInteractive -Command \"(Get-Service SysMain).StartType\"")
-                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
-                using var p = Process.Start(psi)!;
-                var o = p.StandardOutput.ReadToEnd().Trim();
-                p.WaitForExit();
-                return !o.Equals("Disabled", StringComparison.OrdinalIgnoreCase);
-            }
-            catch { return true; }
-        }
+            => GetServiceStartType("SysMain") != ServiceStartMode.Disabled;
+
         public void SetSysMain(bool active)
         {
-            string start = active ? "Automatic" : "Disabled";
-            string stop  = active ? "Start-Service SysMain -ErrorAction SilentlyContinue" : "Stop-Service SysMain -Force -ErrorAction SilentlyContinue";
-            RunPs($"Set-Service SysMain -StartupType {start}; {stop}");
+            SetServiceStartType("SysMain", active ? ServiceStartMode.Automatic : ServiceStartMode.Disabled);
+            ControlService("SysMain", active);
             Logger.Action($"SysMain : {(active ? "actif" : "désactivé")}");
         }
 
         // ── Windows Search Indexing ───────────────────────────────────────────
         public bool IsSearchIndexActive()
-        {
-            try
-            {
-                var psi = new ProcessStartInfo("powershell.exe",
-                    "-NoProfile -NonInteractive -Command \"(Get-Service WSearch).StartType\"")
-                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
-                using var p = Process.Start(psi)!;
-                var o = p.StandardOutput.ReadToEnd().Trim();
-                p.WaitForExit();
-                return !o.Equals("Disabled", StringComparison.OrdinalIgnoreCase);
-            }
-            catch { return true; }
-        }
+            => GetServiceStartType("WSearch") != ServiceStartMode.Disabled;
+
         public void SetSearchIndex(bool active)
         {
-            string start = active ? "Automatic" : "Disabled";
-            string stop  = active ? "Start-Service WSearch -ErrorAction SilentlyContinue" : "Stop-Service WSearch -Force -ErrorAction SilentlyContinue";
-            RunPs($"Set-Service WSearch -StartupType {start}; {stop}");
+            SetServiceStartType("WSearch", active ? ServiceStartMode.Automatic : ServiceStartMode.Disabled);
+            ControlService("WSearch", active);
             Logger.Action($"Windows Search : {(active ? "actif" : "désactivé")}");
         }
 
         // ── Windows Error Reporting ───────────────────────────────────────────
         public bool IsWerActive()
-        {
-            try
-            {
-                var psi = new ProcessStartInfo("powershell.exe",
-                    "-NoProfile -NonInteractive -Command \"(Get-Service WerSvc).StartType\"")
-                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
-                using var p = Process.Start(psi)!;
-                var o = p.StandardOutput.ReadToEnd().Trim();
-                p.WaitForExit();
-                return !o.Equals("Disabled", StringComparison.OrdinalIgnoreCase);
-            }
-            catch { return true; }
-        }
+            => GetServiceStartType("WerSvc") != ServiceStartMode.Disabled;
+
         public void SetWer(bool active)
         {
-            string start = active ? "Manual" : "Disabled";
-            string stop  = active ? "" : "; Stop-Service WerSvc -Force -ErrorAction SilentlyContinue";
-            RunPs($"Set-Service WerSvc -StartupType {start}{stop}");
+            SetServiceStartType("WerSvc", active ? ServiceStartMode.Manual : ServiceStartMode.Disabled);
+            if (!active) ControlService("WerSvc", false);
             Logger.Action($"Windows Error Reporting : {(active ? "actif" : "désactivé")}");
         }
 
-        private void RunCmd(string cmd)
+        // ── Helpers services ──────────────────────────────────────────────────
+        private static ServiceStartMode GetServiceStartType(string name)
         {
             try
             {
-                var psi = new ProcessStartInfo("cmd.exe", "/c " + cmd)
-                { UseShellExecute = false, CreateNoWindow = true };
-                using var p = Process.Start(psi);
-                p!.WaitForExit();
+                using var sc = new ServiceController(name);
+                return sc.StartType;
             }
-            catch (Exception e) { Logger.Warn($"OptimService : {e.Message}"); }
+            catch { return ServiceStartMode.Disabled; }
         }
 
-        private void RunPs(string command)
+        // ServiceController n'expose pas SetStartupType → on passe par le registre
+        private static void SetServiceStartType(string name, ServiceStartMode mode)
+        {
+            int value = mode switch
+            {
+                ServiceStartMode.Automatic => 2,
+                ServiceStartMode.Manual    => 3,
+                _                          => 4   // Disabled
+            };
+            RegistryHelper.SetDwordHklm($@"SYSTEM\CurrentControlSet\Services\{name}", "Start", value);
+        }
+
+        private static void ControlService(string name, bool start)
+        {
+            try
+            {
+                using var sc = new ServiceController(name);
+                if (start && sc.Status != ServiceControllerStatus.Running)
+                    sc.Start();
+                else if (!start && sc.Status == ServiceControllerStatus.Running)
+                    sc.Stop();
+            }
+            catch { }
+        }
+
+        private static void RunPs(string command)
         {
             try
             {
@@ -197,7 +184,7 @@ namespace PCDoctor.Services
                     $"-NoProfile -NonInteractive -Command \"{command}\"")
                 { UseShellExecute = false, CreateNoWindow = true };
                 using var p = Process.Start(psi);
-                p!.WaitForExit();
+                p?.WaitForExit();
             }
             catch (Exception e) { Logger.Warn($"OptimService PS : {e.Message}"); }
         }
