@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Management;
 
 namespace PCDoctor.Services
 {
@@ -51,38 +52,52 @@ namespace PCDoctor.Services
 
         public string GetCurrentDnsPreset()
         {
-            // Lire le premier serveur DNS de l'interface active principale
-            string primary = RunPs(
-                "(Get-DnsClientServerAddress -AddressFamily IPv4 | Where-Object {$_.ServerAddresses.Count -gt 0} | Select-Object -First 1).ServerAddresses[0]"
-            ).Trim();
-
-            foreach (var (label, p, _) in DnsPresets)
-                if (p == primary) return label;
-
-            return primary.Length > 0 ? $"Personnalisé ({primary})" : "Automatique (FAI)";
+            try
+            {
+                using var searcher = new ManagementObjectSearcher(
+                    "SELECT DNSServerSearchOrder FROM Win32_NetworkAdapterConfiguration WHERE IPEnabled = True");
+                foreach (var obj in searcher.Get())
+                {
+                    var servers = obj["DNSServerSearchOrder"] as string[];
+                    if (servers?.Length > 0)
+                    {
+                        string primary = servers[0];
+                        foreach (var (label, p, _) in DnsPresets)
+                            if (p == primary) return label;
+                        return $"Personnalisé ({primary})";
+                    }
+                }
+            }
+            catch (Exception e) { Logger.Warn($"GetCurrentDnsPreset : {e.Message}"); }
+            return "Automatique (FAI)";
         }
 
         public string SetDnsPreset(string label)
         {
-            var preset = System.Array.Find(DnsPresets, x => x.Label == label);
+            var preset = Array.Find(DnsPresets, x => x.Label == label);
             try
             {
+                using var searcher = new ManagementObjectSearcher(
+                    "SELECT * FROM Win32_NetworkAdapterConfiguration WHERE IPEnabled = True");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    if (string.IsNullOrEmpty(preset.Primary))
+                        obj.InvokeMethod("SetDNSServerSearchOrder", new object?[] { null });
+                    else
+                    {
+                        var servers = string.IsNullOrEmpty(preset.Secondary)
+                            ? new[] { preset.Primary }
+                            : new[] { preset.Primary, preset.Secondary };
+                        obj.InvokeMethod("SetDNSServerSearchOrder", new object[] { servers });
+                    }
+                }
                 if (string.IsNullOrEmpty(preset.Primary))
                 {
-                    // Remettre en automatique (DHCP)
-                    RunPs("Get-NetAdapter | Where-Object Status -eq Up | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.InterfaceIndex -ResetServerAddresses }");
                     Logger.Action("DNS remis en automatique (DHCP)");
                     return "DNS remis en automatique (FAI/DHCP).";
                 }
-                else
-                {
-                    string servers = string.IsNullOrEmpty(preset.Secondary)
-                        ? $"'{preset.Primary}'"
-                        : $"'{preset.Primary}','{preset.Secondary}'";
-                    RunPs($"Get-NetAdapter | Where-Object Status -eq Up | ForEach-Object {{ Set-DnsClientServerAddress -InterfaceIndex $_.InterfaceIndex -ServerAddresses ({servers}) }}");
-                    Logger.Action($"DNS changé : {label} ({preset.Primary})");
-                    return $"DNS appliqué : {label} ({preset.Primary} / {preset.Secondary}).";
-                }
+                Logger.Action($"DNS changé : {label} ({preset.Primary})");
+                return $"DNS appliqué : {label} ({preset.Primary} / {preset.Secondary}).";
             }
             catch (Exception e) { Logger.Warn($"SetDnsPreset : {e.Message}"); return $"Erreur : {e.Message}"; }
         }
