@@ -102,8 +102,12 @@ namespace PCDoctor.Services
             ScanRegHive("HKCU", Registry.CurrentUser,  @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",             keyword, result);
 
             // Registre — Run / RunOnce
-            ScanRegValues("HKLM", Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run",     keyword, result);
-            ScanRegValues("HKCU", Registry.CurrentUser,  @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run",     keyword, result);
+            ScanRegValues("HKLM", Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run",      keyword, result);
+            ScanRegValues("HKCU", Registry.CurrentUser,  @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run",      keyword, result);
+
+            // Registre — UFH (Shell History Cache : raccourcis récents)
+            ScanRegValues("HKCU", Registry.CurrentUser,  @"SOFTWARE\Microsoft\Windows\CurrentVersion\UFH\SHC",  keyword, result);
+            ScanRegValues("HKLM", Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\UFH\ARP",  keyword, result);
 
             Logger.Info($"Résidus '{keyword}' : {result.Count} élément(s) trouvé(s)");
             return result;
