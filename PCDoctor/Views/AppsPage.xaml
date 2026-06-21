@@ -127,6 +127,8 @@
 
                 <!-- Actions résidus -->
                 <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Button Content="Tout sélectionner"
+                            Command="{Binding SelectAllResidusCommand}"/>
                     <Button Content="Supprimer la sélection"
                             Command="{Binding CleanResidusCommand}"
                             Style="{StaticResource AccentButtonStyle}"/>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using Microsoft.Win32;
 
@@ -7,13 +8,21 @@ namespace PCDoctor.Services
 {
     public enum ResiduType { Folder, File, RegistryKey }
 
-    public class ResiduItem
+    public class ResiduItem : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public string    Path        { get; set; } = "";
         public ResiduType Type       { get; set; }
         public string    SizeStr     { get; set; } = "";
-        public bool      IsSelected  { get; set; } = false;
         public string    TypeLabel   => Type switch { ResiduType.Folder => "Dossier", ResiduType.File => "Fichier", _ => "Registre" };
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected))); }
+        }
 
         // Utilisés pour la suppression (meme assembly)
         public string RegHiveName    { get; set; } = "";   // "HKLM" ou "HKCU"

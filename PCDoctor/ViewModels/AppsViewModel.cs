@@ -78,6 +78,12 @@ namespace PCDoctor.ViewModels
         // ─── Résidus ───
 
         [RelayCommand]
+        private void SelectAllResidus()
+        {
+            foreach (var r in ResidusItems) r.IsSelected = true;
+        }
+
+        [RelayCommand]
         private async Task ScanResidus()
         {
             if (string.IsNullOrWhiteSpace(ResidusSearchName)) return;
