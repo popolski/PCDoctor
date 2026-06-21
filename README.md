@@ -5,7 +5,7 @@ Outil d'administration et d'optimisation Windows, conçu pour les utilisateurs a
 ![Windows 11](https://img.shields.io/badge/Windows%2011-0078D4?style=flat&logo=windows11&logoColor=white)
 ![.NET 8](https://img.shields.io/badge/.NET%208-512BD4?style=flat&logo=dotnet&logoColor=white)
 ![WinUI 3](https://img.shields.io/badge/WinUI%203-0078D4?style=flat&logo=microsoft&logoColor=white)
-![Version](https://img.shields.io/badge/version-1.1-blue?style=flat)
+![Version](https://img.shields.io/badge/version-1.2-blue?style=flat)
 
 ## Fonctionnalités
 
@@ -33,7 +33,7 @@ Outil d'administration et d'optimisation Windows, conçu pour les utilisateurs a
 
 ## Installation
 
-Télécharge le setup depuis la page [Releases](https://github.com/popolski/PCDoctor/releases) et lance `PCDoctor_Setup_v1.1.exe`. L'installeur gère les prérequis automatiquement.
+Télécharge le setup depuis la page [Releases](https://github.com/popolski/PCDoctor/releases) et lance `PCDoctor_Setup_v1.2.exe`. L'installeur gère les prérequis automatiquement.
 
 Les mises à jour suivantes peuvent être installées directement depuis l'application (page Accueil).
 
