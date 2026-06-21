@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -9,7 +11,12 @@ namespace PCDoctor.ViewModels
     public partial class HardeningViewModel : ObservableObject
     {
         private readonly HardeningService _svc = new();
-        private bool _loading; // évite de déclencher les actions pendant la synchro initiale
+        private bool _loading;
+
+        public bool MpCmdRunAvailable { get; } = File.Exists(
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                         "Windows Defender", "MpCmdRun.exe"));
+        public bool MpCmdRunUnavailable => !MpCmdRunAvailable; // évite de déclencher les actions pendant la synchro initiale
 
         [ObservableProperty] private bool llmnrActive;
         [ObservableProperty] private bool smb1Active;

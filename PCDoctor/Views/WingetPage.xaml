@@ -21,6 +21,13 @@
         <!-- Titre -->
         <TextBlock Grid.Row="0" Text="Mises à jour (Winget)" FontSize="32" FontWeight="SemiBold"/>
 
+        <!-- Winget indisponible -->
+        <InfoBar Grid.Row="0" Margin="0,52,0,0"
+                 IsOpen="{Binding WingetUnavailable}"
+                 Severity="Warning" IsClosable="False"
+                 Title="Winget non disponible"
+                 Message="Le Gestionnaire de packages Windows (winget) n'est pas installé ou accessible. Installez-le via le Microsoft Store (App Installer)."/>
+
         <!-- Barre d'actions -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10">
             <Button Content="Analyser"

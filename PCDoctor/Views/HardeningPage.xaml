@@ -16,6 +16,11 @@
             <TextBlock Text="Les interrupteurs reflètent l'état réel. ON = fonctionnalité Windows active."
                        Opacity="0.7" TextWrapping="Wrap"/>
 
+            <InfoBar IsOpen="{Binding MpCmdRunUnavailable}"
+                     Severity="Warning" IsClosable="False"
+                     Title="Windows Defender introuvable"
+                     Message="MpCmdRun.exe est absent — le scan rapide Defender ne sera pas disponible sur ce système."/>
+
             <!-- LLMNR -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="20"
                     BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">

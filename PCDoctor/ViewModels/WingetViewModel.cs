@@ -24,12 +24,15 @@ namespace PCDoctor.ViewModels
         [ObservableProperty] private bool   canScan    = true;
         [ObservableProperty] private string logText    = "";
 
+        public bool WingetUnavailable { get; }
+
         public WingetViewModel()
         {
-            if (!_svc.IsAvailable())
+            WingetUnavailable = !_svc.IsAvailable();
+            if (WingetUnavailable)
             {
                 CanScan    = false;
-                StatusText = "Winget (Gestionnaire de package Windows) n'est pas disponible sur ce systeme.";
+                StatusText = "Winget n'est pas disponible sur ce système.";
             }
         }
 
