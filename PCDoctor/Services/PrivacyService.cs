@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.ServiceProcess;
 using Microsoft.Win32;
 
 namespace PCDoctor.Services
@@ -17,12 +17,14 @@ namespace PCDoctor.Services
             if (active)
             {
                 RegistryHelper.DeleteValueHklm(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection", "AllowTelemetry");
-                RunPs("Set-Service DiagTrack -StartupType Automatic; Start-Service DiagTrack");
+                SetServiceStartType("DiagTrack", 2); // Automatic
+                ControlService("DiagTrack", true);
             }
             else
             {
                 RegistryHelper.SetDwordHklm(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection", "AllowTelemetry", 0);
-                RunPs("Stop-Service DiagTrack -Force; Set-Service DiagTrack -StartupType Disabled");
+                ControlService("DiagTrack", false);
+                SetServiceStartType("DiagTrack", 4); // Disabled
             }
         }
 
@@ -233,14 +235,21 @@ namespace PCDoctor.Services
             catch { }
         }
 
-        private void RunPs(string cmd)
+        private static void SetServiceStartType(string name, int startValue)
+        {
+            try { RegistryHelper.SetDwordHklm($@"SYSTEM\CurrentControlSet\Services\{name}", "Start", startValue); }
+            catch { }
+        }
+
+        private static void ControlService(string name, bool start)
         {
             try
             {
-                var psi = new ProcessStartInfo("powershell", $"-NoProfile -Command \"{cmd}\"")
-                { UseShellExecute = false, CreateNoWindow = true };
-                using var p = Process.Start(psi);
-                p!.WaitForExit();
+                using var sc = new ServiceController(name);
+                if (start && sc.Status != ServiceControllerStatus.Running)
+                    sc.Start();
+                else if (!start && sc.Status == ServiceControllerStatus.Running)
+                    sc.Stop();
             }
             catch { }
         }
